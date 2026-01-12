@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment (민감 정보)
+.env
+.env.local
+.env.*.local
+server/.env
+client/.env
+
+# Payment credentials (네이버페이 등)
+**/naverpay*.json
+**/payment-keys/
+*.pem
+*.key
+
+# Build
+client/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads (local)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Temp
+*.tmp
+*.temp
