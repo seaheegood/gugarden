@@ -56,17 +56,17 @@ function Home() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
             <Link to="/terrarium" style={{ display: 'block' }}>
-              <div style={{ aspectRatio: '4/5', background: '#1a1a1a', marginBottom: '16px' }} />
+              <div style={{ aspectRatio: '4/3', background: '#1a1a1a', marginBottom: '16px' }} />
               <h3 style={{ fontSize: '16px', marginBottom: '8px' }}>Terrarium</h3>
               <p style={{ fontSize: '12px', color: '#888' }}>밀폐된 유리 안의 작은 생태계</p>
             </Link>
             <Link to="/vivarium" style={{ display: 'block' }}>
-              <div style={{ aspectRatio: '4/5', background: '#1a1a1a', marginBottom: '16px' }} />
+              <div style={{ aspectRatio: '4/3', background: '#1a1a1a', marginBottom: '16px' }} />
               <h3 style={{ fontSize: '16px', marginBottom: '8px' }}>Vivarium</h3>
               <p style={{ fontSize: '12px', color: '#888' }}>살아있는 자연을 담은 공간</p>
             </Link>
             <Link to="/kit" style={{ display: 'block' }}>
-              <div style={{ aspectRatio: '4/5', background: '#1a1a1a', marginBottom: '16px' }} />
+              <div style={{ aspectRatio: '4/3', background: '#1a1a1a', marginBottom: '16px' }} />
               <h3 style={{ fontSize: '16px', marginBottom: '8px' }}>Kit</h3>
               <p style={{ fontSize: '12px', color: '#888' }}>직접 만드는 나만의 정원</p>
             </Link>

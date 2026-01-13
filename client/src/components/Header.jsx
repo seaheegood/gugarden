@@ -8,6 +8,10 @@ function Header() {
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
 
+  // 히어로 섹션이 있는 페이지들 (투명 헤더 적용)
+  const heroPages = ['/', '/terrarium', '/vivarium', '/kit', '/rental'];
+  const hasHero = heroPages.includes(location.pathname);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -35,18 +39,26 @@ function Header() {
         left: 0,
         right: 0,
         zIndex: 50,
-        padding: isScrolled ? '16px 0' : '28px 0',
-        background: isScrolled ? 'rgba(0,0,0,0.95)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(10px)' : 'none',
+        height: (hasHero && !isScrolled) ? '100px' : '70px',
+        background: (hasHero && !isScrolled) ? 'transparent' : 'rgba(0,0,0,0.95)',
+        backdropFilter: (hasHero && !isScrolled) ? 'none' : 'blur(10px)',
         transition: 'all 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
       }}
     >
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 80px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 80px', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* 로고 */}
-          <Link to="/" style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.3em' }}>
-            구의정원
-          </Link>
+          <div style={{ flex: '1 1 0', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', lineHeight: 0 }}>
+              <img
+                src="/gugarden.png"
+                alt="구의정원"
+                style={{ height: '48px', width: 'auto', display: 'block' }}
+              />
+            </Link>
+          </div>
 
           {/* 데스크톱 네비게이션 */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
@@ -67,7 +79,7 @@ function Header() {
           </nav>
 
           {/* 유틸리티 메뉴 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <div style={{ flex: '1 1 0', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '32px' }}>
             <Link
               to="/cart"
               style={{ fontSize: '13px', letterSpacing: '0.1em', color: '#888' }}

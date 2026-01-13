@@ -62,9 +62,9 @@ function ProductList() {
   }
 
   return (
-    <div style={{ paddingTop: '80px', background: '#000', minHeight: '100vh' }}>
+    <div style={{ background: '#000', minHeight: '100vh' }}>
       {/* 히어로 섹션 */}
-      <section style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
+      <section style={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
         <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.3em', marginBottom: '16px' }}>
             {info.title}
@@ -91,7 +91,19 @@ function ProductList() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              style={{ background: 'transparent', border: '1px solid #333', padding: '8px 16px', fontSize: '14px', color: '#fff', cursor: 'pointer' }}
+              style={{
+                background: 'transparent',
+                border: '1px solid #333',
+                padding: '8px 32px 8px 16px',
+                fontSize: '14px',
+                color: '#fff',
+                cursor: 'pointer',
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23888888' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                backgroundPosition: 'right 10px center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '16px 16px',
+              }}
             >
               <option value="newest" style={{ background: '#000' }}>최신순</option>
               <option value="price-low" style={{ background: '#000' }}>가격 낮은순</option>

@@ -27,10 +27,10 @@ function Rental() {
   }
 
   const services = [
-    { title: '기업 오피스', description: '업무 공간에 자연의 활력을 더해 직원들의 창의성과 생산성을 높입니다.', icon: '🏢' },
+    { title: '드라마 & 영화 소품', description: '작품의 분위기를 살리는 자연스러운 소품으로 장면에 생동감을 더합니다.', icon: '🎬' },
     { title: '카페 & 레스토랑', description: '고객에게 특별한 분위기를 선사하고 공간의 품격을 높입니다.', icon: '☕' },
     { title: '매장 & 쇼룸', description: '브랜드의 가치를 자연과 함께 표현하여 고객 경험을 향상시킵니다.', icon: '🏪' },
-    { title: '호텔 & 리조트', description: '로비와 객실에 자연의 고요함을 담아 특별한 휴식 공간을 만듭니다.', icon: '🏨' },
+    { title: '소품샵 입점', description: '감각적인 소품샵에 테라리움을 입점하여 새로운 고객층을 만나보세요.', icon: '🌿' },
   ]
 
   const process = [
@@ -43,9 +43,9 @@ function Rental() {
   const inputStyle = { width: '100%', background: 'transparent', border: '1px solid #333', padding: '12px 16px', fontSize: '14px', color: '#fff' }
 
   return (
-    <div style={{ paddingTop: '80px' }}>
+    <div>
       {/* 히어로 섹션 */}
-      <section style={{ height: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
+      <section style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
         <div style={{ textAlign: 'center' }}>
           <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '24px' }}>FOR BUSINESS</p>
           <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px' }}>RENTAL SERVICE</h1>

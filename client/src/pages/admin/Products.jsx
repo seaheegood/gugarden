@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '../../api'
 
 function Products() {
@@ -20,6 +20,14 @@ function Products() {
     isActive: true,
     isFeatured: false,
   })
+
+  // 이미지 업로드 관련 상태
+  const [thumbnailFile, setThumbnailFile] = useState(null)
+  const [thumbnailPreview, setThumbnailPreview] = useState('')
+  const [productImages, setProductImages] = useState([])
+  const [uploadingImages, setUploadingImages] = useState(false)
+  const thumbnailInputRef = useRef(null)
+  const imagesInputRef = useRef(null)
 
   useEffect(() => {
     fetchCategories()
@@ -61,13 +69,23 @@ function Products() {
     }
   }
 
+  const fetchProductImages = async (productId) => {
+    try {
+      const response = await api.get(`/admin/products/${productId}/images`)
+      setProductImages(response.data.images || [])
+    } catch (error) {
+      console.error('상품 이미지 조회 에러:', error)
+      setProductImages([])
+    }
+  }
+
   const handleSearch = (e) => {
     e.preventDefault()
     setPagination((prev) => ({ ...prev, page: 1 }))
     fetchProducts()
   }
 
-  const openModal = (product = null) => {
+  const openModal = async (product = null) => {
     if (product) {
       setEditingProduct(product)
       setFormData({
@@ -81,6 +99,8 @@ function Products() {
         isActive: product.is_active,
         isFeatured: product.is_featured,
       })
+      setThumbnailPreview(product.thumbnail || '')
+      await fetchProductImages(product.id)
     } else {
       setEditingProduct(null)
       setFormData({
@@ -94,13 +114,19 @@ function Products() {
         isActive: true,
         isFeatured: false,
       })
+      setThumbnailPreview('')
+      setProductImages([])
     }
+    setThumbnailFile(null)
     setShowModal(true)
   }
 
   const closeModal = () => {
     setShowModal(false)
     setEditingProduct(null)
+    setThumbnailFile(null)
+    setThumbnailPreview('')
+    setProductImages([])
   }
 
   const handleChange = (e) => {
@@ -109,6 +135,93 @@ function Products() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
+  }
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.')
+        return
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('파일 크기는 10MB 이하여야 합니다.')
+        return
+      }
+      setThumbnailFile(file)
+      setThumbnailPreview(URL.createObjectURL(file))
+      setFormData((prev) => ({ ...prev, thumbnail: '' }))
+    }
+  }
+
+  const removeThumbnail = () => {
+    setThumbnailFile(null)
+    setThumbnailPreview('')
+    setFormData((prev) => ({ ...prev, thumbnail: '' }))
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = ''
+    }
+  }
+
+  const handleImagesUpload = async (e) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    if (!editingProduct) {
+      alert('상품을 먼저 저장한 후 추가 이미지를 업로드해주세요.')
+      return
+    }
+
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일만 업로드 가능합니다.')
+        return
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('파일 크기는 10MB 이하여야 합니다.')
+        return
+      }
+    }
+
+    if (productImages.length + files.length > 10) {
+      alert('상품당 최대 10개의 이미지만 등록 가능합니다.')
+      return
+    }
+
+    try {
+      setUploadingImages(true)
+      const formData = new FormData()
+      for (const file of files) {
+        formData.append('images', file)
+      }
+
+      const response = await api.post(
+        `/admin/products/${editingProduct.id}/images`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+
+      setProductImages(response.data.images || [])
+      alert('이미지가 추가되었습니다.')
+    } catch (error) {
+      alert(error.response?.data?.error || '이미지 업로드에 실패했습니다.')
+    } finally {
+      setUploadingImages(false)
+      if (imagesInputRef.current) {
+        imagesInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleImageDelete = async (imageId) => {
+    if (!confirm('이 이미지를 삭제하시겠습니까?')) return
+
+    try {
+      await api.delete(`/admin/products/images/${imageId}`)
+      setProductImages((prev) => prev.filter((img) => img.id !== imageId))
+    } catch (error) {
+      alert(error.response?.data?.error || '이미지 삭제에 실패했습니다.')
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -120,23 +233,31 @@ function Products() {
     }
 
     try {
-      const data = {
-        categoryId: parseInt(formData.categoryId),
-        name: formData.name,
-        description: formData.description || null,
-        price: parseInt(formData.price),
-        salePrice: formData.salePrice ? parseInt(formData.salePrice) : null,
-        stock: parseInt(formData.stock) || 0,
-        thumbnail: formData.thumbnail || null,
-        isActive: formData.isActive,
-        isFeatured: formData.isFeatured,
+      const submitData = new FormData()
+      submitData.append('categoryId', parseInt(formData.categoryId))
+      submitData.append('name', formData.name)
+      submitData.append('description', formData.description || '')
+      submitData.append('price', parseInt(formData.price))
+      if (formData.salePrice) {
+        submitData.append('salePrice', parseInt(formData.salePrice))
+      }
+      submitData.append('stock', parseInt(formData.stock) || 0)
+      submitData.append('isActive', formData.isActive)
+      submitData.append('isFeatured', formData.isFeatured)
+
+      if (thumbnailFile) {
+        submitData.append('thumbnail', thumbnailFile)
+      } else if (formData.thumbnail) {
+        submitData.append('thumbnail', formData.thumbnail)
       }
 
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } }
+
       if (editingProduct) {
-        await api.put(`/admin/products/${editingProduct.id}`, data)
+        await api.put(`/admin/products/${editingProduct.id}`, submitData, config)
         alert('상품이 수정되었습니다.')
       } else {
-        await api.post('/admin/products', data)
+        await api.post('/admin/products', submitData, config)
         alert('상품이 등록되었습니다.')
       }
 
@@ -164,24 +285,32 @@ function Products() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-light tracking-[0.2em]">상품 관리</h1>
+    <div className="p-6 lg:p-8">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-wide text-gray-800">상품 관리</h1>
+          <p className="text-sm text-gray-500 mt-2">상품을 등록하고 관리하세요</p>
+        </div>
         <button
           onClick={() => openModal()}
-          className="px-6 py-2 bg-white text-black text-sm tracking-wider hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1.5"
         >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
           상품 등록
         </button>
       </div>
 
       {/* 필터 */}
-      <div className="bg-[#0a0a0a] border border-gray-800 p-4 mb-6">
-        <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <form onSubmit={handleSearch} className="flex flex-wrap gap-3 items-center">
           <select
             value={filter.category}
             onChange={(e) => setFilter((prev) => ({ ...prev, category: e.target.value }))}
-            className="bg-black border border-gray-700 px-4 py-2 text-sm focus:border-gray-500 focus:outline-none"
+            className="bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm text-gray-700 focus:border-gray-500 focus:outline-none appearance-none cursor-pointer"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.25em 1.25em' }}
           >
             <option value="">전체 카테고리</option>
             {categories.map((cat) => (
@@ -196,12 +325,12 @@ function Products() {
             value={filter.search}
             onChange={(e) => setFilter((prev) => ({ ...prev, search: e.target.value }))}
             placeholder="상품명 검색"
-            className="flex-1 min-w-[200px] bg-black border border-gray-700 px-4 py-2 text-sm focus:border-gray-500 focus:outline-none"
+            className="flex-1 min-w-[180px] bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-500 focus:outline-none"
           />
 
           <button
             type="submit"
-            className="px-6 py-2 border border-gray-700 text-sm hover:border-white transition-colors"
+            className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
           >
             검색
           </button>
@@ -209,29 +338,32 @@ function Products() {
       </div>
 
       {/* 상품 목록 */}
-      <div className="bg-[#0a0a0a] border border-gray-800">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">로딩 중...</div>
+          <div className="p-12 text-center">
+            <div className="w-8 h-8 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-gray-600 text-sm">로딩 중...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-800 text-left text-xs text-gray-500">
-                  <th className="px-6 py-4 font-normal">이미지</th>
-                  <th className="px-6 py-4 font-normal">상품명</th>
-                  <th className="px-6 py-4 font-normal">카테고리</th>
-                  <th className="px-6 py-4 font-normal">가격</th>
-                  <th className="px-6 py-4 font-normal">재고</th>
-                  <th className="px-6 py-4 font-normal">상태</th>
-                  <th className="px-6 py-4 font-normal">관리</th>
+                <tr className="border-b border-gray-200 text-left bg-gray-50">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">이미지</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">상품명</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">카테고리</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">가격</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">재고</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">상태</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">관리</th>
                 </tr>
               </thead>
               <tbody>
                 {products.length > 0 ? (
                   products.map((product) => (
-                    <tr key={product.id} className="border-b border-gray-800/50 hover:bg-gray-900/30">
-                      <td className="px-6 py-4">
-                        <div className="w-12 h-12 bg-gray-800 overflow-hidden">
+                    <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-5 py-3">
+                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
                           {product.thumbnail ? (
                             <img
                               src={product.thumbnail}
@@ -239,54 +371,56 @@ function Products() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
                               No img
                             </div>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm">{product.name}</p>
+                      <td className="px-5 py-3">
+                        <p className="text-sm font-medium text-gray-800 mb-1">{product.name}</p>
                         {product.is_featured && (
-                          <span className="text-xs text-yellow-500">추천</span>
+                          <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">추천</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">
+                      <td className="px-5 py-3 text-sm text-gray-600">
                         {product.category_name}
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm">₩ {formatPrice(product.price)}</p>
+                      <td className="px-5 py-3">
+                        <p className="text-sm font-semibold text-gray-800">₩{formatPrice(product.price)}</p>
                         {product.sale_price && (
-                          <p className="text-xs text-red-500">
-                            ₩ {formatPrice(product.sale_price)}
+                          <p className="text-xs text-red-600 font-medium mt-1">
+                            ₩{formatPrice(product.sale_price)}
                           </p>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={product.stock < 5 ? 'text-red-500' : ''}>
+                      <td className="px-5 py-3 text-sm">
+                        <span className={product.stock < 5 ? 'text-red-600 font-semibold' : 'text-gray-700'}>
                           {product.stock}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3">
                         <span
-                          className={`text-xs ${
-                            product.is_active ? 'text-green-500' : 'text-gray-500'
+                          className={`text-xs font-medium px-3 py-1.5 rounded-full ${
+                            product.is_active
+                              ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                              : 'bg-gray-100 text-gray-600 border border-gray-200'
                           }`}
                         >
                           {product.is_active ? '활성' : '비활성'}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3">
                         <div className="flex gap-2">
                           <button
                             onClick={() => openModal(product)}
-                            className="text-xs text-gray-400 hover:text-white"
+                            className="text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors px-2.5 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
                           >
                             수정
                           </button>
                           <button
                             onClick={() => handleDelete(product.id)}
-                            className="text-xs text-red-500 hover:text-red-400"
+                            className="text-xs font-medium text-red-600 hover:text-red-700 transition-colors px-2.5 py-1.5 bg-red-50 rounded-md hover:bg-red-100"
                           >
                             삭제
                           </button>
@@ -296,7 +430,7 @@ function Products() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={7} className="px-5 py-12 text-center text-gray-500 text-sm">
                       상품이 없습니다.
                     </td>
                   </tr>
@@ -308,15 +442,15 @@ function Products() {
 
         {/* 페이지네이션 */}
         {pagination.totalPages > 1 && (
-          <div className="flex justify-center gap-2 p-4 border-t border-gray-800">
+          <div className="flex justify-center gap-2 p-4 border-t border-gray-200 bg-gray-50">
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => setPagination((prev) => ({ ...prev, page }))}
-                className={`w-8 h-8 text-sm ${
+                className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
                   pagination.page === page
-                    ? 'bg-white text-black'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:bg-gray-200 border border-gray-300'
                 }`}
               >
                 {page}
@@ -328,26 +462,32 @@ function Products() {
 
       {/* 상품 등록/수정 모달 */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0a0a0a] border border-gray-800 w-full max-w-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-800">
-              <h2 className="text-lg font-light tracking-wider">
-                {editingProduct ? '상품 수정' : '상품 등록'}
-              </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-white">
-                ✕
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-gray-50">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {editingProduct ? '상품 수정' : '상품 등록'}
+                </h2>
+                <p className="text-xs text-gray-500 mt-1">상품 정보를 입력하세요</p>
+              </div>
+              <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 transition-colors p-1">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label className="block text-xs text-gray-400 mb-2">카테고리 *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">카테고리 *</label>
                 <select
                   name="categoryId"
                   value={formData.categoryId}
                   onChange={handleChange}
                   required
-                  className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none"
+                  className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm text-gray-700 focus:border-gray-500 focus:outline-none appearance-none cursor-pointer"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.25em 1.25em' }}
                 >
                   <option value="">선택하세요</option>
                   {categories.map((cat) => (
@@ -359,85 +499,186 @@ function Products() {
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 mb-2">상품명 *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">상품명 *</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none"
+                  className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:border-gray-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 mb-2">설명</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">설명</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  rows={4}
-                  className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none resize-none"
+                  rows={3}
+                  className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:border-gray-500 focus:outline-none resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-400 mb-2">정가 *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">정가 *</label>
                   <input
                     type="number"
                     name="price"
                     value={formData.price}
                     onChange={handleChange}
                     required
-                    className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none"
+                    className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:border-gray-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-400 mb-2">할인가</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">할인가</label>
                   <input
                     type="number"
                     name="salePrice"
                     value={formData.salePrice}
                     onChange={handleChange}
-                    className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none"
+                    className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:border-gray-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs text-gray-400 mb-2">재고</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">재고</label>
                 <input
                   type="number"
                   name="stock"
                   value={formData.stock}
                   onChange={handleChange}
-                  className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none"
+                  className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:border-gray-500 focus:outline-none"
                 />
               </div>
 
+              {/* 썸네일 이미지 업로드 */}
               <div>
-                <label className="block text-xs text-gray-400 mb-2">썸네일 URL</label>
-                <input
-                  type="text"
-                  name="thumbnail"
-                  value={formData.thumbnail}
-                  onChange={handleChange}
-                  placeholder="/uploads/products/image.jpg"
-                  className="w-full bg-black border border-gray-700 px-4 py-3 text-sm focus:border-gray-500 focus:outline-none"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">썸네일 이미지</label>
+                <div className="space-y-2">
+                  {thumbnailPreview && (
+                    <div className="relative inline-block">
+                      <img
+                        src={thumbnailPreview}
+                        alt="썸네일 미리보기"
+                        className="w-24 h-24 object-cover rounded-md border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeThumbnail}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 flex items-center justify-center"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 items-center">
+                    <input
+                      ref={thumbnailInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => thumbnailInputRef.current?.click()}
+                      className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                      파일 선택
+                    </button>
+                    <span className="text-xs text-gray-500">
+                      {thumbnailFile ? thumbnailFile.name : '선택된 파일 없음'}
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    name="thumbnail"
+                    value={formData.thumbnail}
+                    onChange={(e) => {
+                      handleChange(e)
+                      if (e.target.value) {
+                        setThumbnailFile(null)
+                        setThumbnailPreview(e.target.value)
+                      }
+                    }}
+                    placeholder="또는 이미지 URL 직접 입력"
+                    className="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-500 focus:outline-none"
+                  />
+                </div>
               </div>
 
-              <div className="flex gap-6">
+              {/* 추가 이미지 (수정 모드에서만) */}
+              {editingProduct && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
+                    추가 이미지 ({productImages.length}/10)
+                  </label>
+
+                  {productImages.length > 0 && (
+                    <div className="flex flex-wrap gap-3 mb-3">
+                      {productImages.map((img) => (
+                        <div key={img.id} className="relative">
+                          <img
+                            src={img.image_url}
+                            alt="상품 이미지"
+                            className="w-20 h-20 object-cover rounded-md border border-gray-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleImageDelete(img.id)}
+                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 shadow-md"
+                          >
+                            <svg className="w-3 h-3 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {productImages.length < 10 && (
+                    <div>
+                      <input
+                        ref={imagesInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImagesUpload}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => imagesInputRef.current?.click()}
+                        disabled={uploadingImages}
+                        className="px-4 py-2 border border-dashed border-gray-400 text-sm font-medium text-gray-600 rounded-md hover:border-gray-500 hover:text-gray-800 transition-colors disabled:opacity-50"
+                      >
+                        {uploadingImages ? '업로드 중...' : '+ 이미지 추가'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex gap-6 py-3">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     name="isActive"
                     checked={formData.isActive}
                     onChange={handleChange}
-                    className="w-4 h-4"
+                    className="w-4 h-4 rounded border-gray-400 text-gray-900 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-400">활성화</span>
+                  <span className="text-sm font-medium text-gray-700">활성화</span>
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -446,23 +687,23 @@ function Products() {
                     name="isFeatured"
                     checked={formData.isFeatured}
                     onChange={handleChange}
-                    className="w-4 h-4"
+                    className="w-4 h-4 rounded border-gray-400 text-gray-900 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-400">추천 상품</span>
+                  <span className="text-sm font-medium text-gray-700">추천 상품</span>
                 </label>
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 py-3 border border-gray-700 text-sm hover:border-white transition-colors"
+                  className="flex-1 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 bg-white text-black text-sm hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors"
                 >
                   {editingProduct ? '수정' : '등록'}
                 </button>

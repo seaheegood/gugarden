@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import api from '../../api'
 
 function Orders() {
@@ -84,21 +83,25 @@ function Orders() {
     return map ? map.label : status
   }
 
-  const getStatusColor = (status) => {
-    const colors = {
-      pending: 'bg-yellow-500/20 text-yellow-500',
-      paid: 'bg-blue-500/20 text-blue-500',
-      preparing: 'bg-purple-500/20 text-purple-500',
-      shipped: 'bg-cyan-500/20 text-cyan-500',
-      delivered: 'bg-green-500/20 text-green-500',
-      cancelled: 'bg-red-500/20 text-red-500',
+  const getStatusStyle = (status) => {
+    const styles = {
+      pending: 'bg-amber-100 text-amber-700 border border-amber-200',
+      paid: 'bg-blue-100 text-blue-700 border border-blue-200',
+      preparing: 'bg-purple-100 text-purple-700 border border-purple-200',
+      shipped: 'bg-cyan-100 text-cyan-700 border border-cyan-200',
+      delivered: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+      cancelled: 'bg-red-100 text-red-700 border border-red-200',
     }
-    return colors[status] || 'bg-gray-500/20 text-gray-500'
+    return styles[status] || 'bg-gray-100 text-gray-700 border border-gray-200'
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-light tracking-[0.2em] mb-8">주문 관리</h1>
+    <div className="p-6 lg:p-8">
+      {/* 헤더 */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-wide text-gray-800">주문 관리</h1>
+        <p className="text-sm text-gray-500 mt-2">주문 내역을 확인하고 상태를 관리하세요</p>
+      </div>
 
       {/* 필터 */}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -109,10 +112,10 @@ function Orders() {
               setStatusFilter(status.value)
               setPagination((prev) => ({ ...prev, page: 1 }))
             }}
-            className={`px-4 py-2 text-sm transition-colors ${
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
               statusFilter === status.value
-                ? 'bg-white text-black'
-                : 'border border-gray-700 text-gray-400 hover:border-white hover:text-white'
+                ? 'bg-gray-900 text-white'
+                : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
             }`}
           >
             {status.label}
@@ -121,58 +124,62 @@ function Orders() {
       </div>
 
       {/* 주문 목록 */}
-      <div className="bg-[#0a0a0a] border border-gray-800">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">로딩 중...</div>
+          <div className="p-12 text-center">
+            <div className="w-8 h-8 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-gray-600 text-sm">로딩 중...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-800 text-left text-xs text-gray-500">
-                  <th className="px-6 py-4 font-normal">주문번호</th>
-                  <th className="px-6 py-4 font-normal">주문자</th>
-                  <th className="px-6 py-4 font-normal">상품</th>
-                  <th className="px-6 py-4 font-normal">금액</th>
-                  <th className="px-6 py-4 font-normal">상태</th>
-                  <th className="px-6 py-4 font-normal">일시</th>
-                  <th className="px-6 py-4 font-normal">관리</th>
+                <tr className="border-b border-gray-200 text-left bg-gray-50">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">주문번호</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">주문자</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">상품</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">금액</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">상태</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">일시</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">관리</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.length > 0 ? (
                   orders.map((order) => (
-                    <tr key={order.id} className="border-b border-gray-800/50 hover:bg-gray-900/30">
-                      <td className="px-6 py-4">
+                    <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-5 py-3">
                         <button
                           onClick={() => openOrderDetail(order.id)}
-                          className="text-sm hover:text-gray-300"
+                          className="text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors"
                         >
                           {order.order_number}
                         </button>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="text-sm">{order.user_name}</p>
+                      <td className="px-5 py-3">
+                        <p className="text-sm font-medium text-gray-800">{order.user_name}</p>
                         <p className="text-xs text-gray-500">{order.user_email}</p>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">
+                      <td className="px-5 py-3 text-sm text-gray-600">
                         {order.item_count}개 상품
                       </td>
-                      <td className="px-6 py-4 text-sm">
-                        ₩ {formatPrice(order.total_amount)}
+                      <td className="px-5 py-3 text-sm font-semibold text-gray-800">
+                        ₩{formatPrice(order.total_amount)}
                       </td>
-                      <td className="px-6 py-4">
-                        <span className={`text-xs px-2 py-1 ${getStatusColor(order.status)}`}>
+                      <td className="px-5 py-3">
+                        <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${getStatusStyle(order.status)}`}>
                           {getStatusText(order.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-5 py-3 text-sm text-gray-500">
                         {formatDate(order.created_at)}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3">
                         <select
                           value={order.status}
                           onChange={(e) => updateStatus(order.id, e.target.value)}
-                          className="bg-black border border-gray-700 text-xs px-2 py-1 focus:outline-none focus:border-gray-500"
+                          className="bg-white border border-gray-300 text-xs font-medium text-gray-700 px-2 py-1.5 pr-7 rounded-md focus:outline-none focus:border-gray-500 appearance-none cursor-pointer"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.3rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1em 1em' }}
                         >
                           {statusList.slice(1).map((s) => (
                             <option key={s.value} value={s.value}>
@@ -185,7 +192,7 @@ function Orders() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={7} className="px-5 py-12 text-center text-gray-500 text-sm">
                       주문이 없습니다.
                     </td>
                   </tr>
@@ -197,15 +204,15 @@ function Orders() {
 
         {/* 페이지네이션 */}
         {pagination.totalPages > 1 && (
-          <div className="flex justify-center gap-2 p-4 border-t border-gray-800">
+          <div className="flex justify-center gap-2 p-4 border-t border-gray-200 bg-gray-50">
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => setPagination((prev) => ({ ...prev, page }))}
-                className={`w-8 h-8 text-sm ${
+                className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
                   pagination.page === page
-                    ? 'bg-white text-black'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:bg-gray-200 border border-gray-300'
                 }`}
               >
                 {page}
@@ -217,31 +224,33 @@ function Orders() {
 
       {/* 주문 상세 모달 */}
       {showModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0a0a0a] border border-gray-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-800">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-gray-50">
               <div>
-                <h2 className="text-lg font-light tracking-wider">주문 상세</h2>
+                <h2 className="text-lg font-semibold text-gray-800">주문 상세</h2>
                 <p className="text-xs text-gray-500 mt-1">{selectedOrder.order_number}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1"
               >
-                ✕
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-8 space-y-6">
               {/* 주문 상태 */}
               <div className="flex items-center justify-between">
-                <span className={`text-sm px-3 py-1 ${getStatusColor(selectedOrder.status)}`}>
+                <span className={`text-sm font-medium px-4 py-2 rounded-full ${getStatusStyle(selectedOrder.status)}`}>
                   {getStatusText(selectedOrder.status)}
                 </span>
                 <select
                   value={selectedOrder.status}
                   onChange={(e) => updateStatus(selectedOrder.id, e.target.value)}
-                  className="bg-black border border-gray-700 text-sm px-3 py-2 focus:outline-none"
+                  className="bg-gray-50 border border-gray-300 text-sm font-medium text-gray-700 px-4 py-2.5 rounded-lg focus:outline-none"
                 >
                   {statusList.slice(1).map((s) => (
                     <option key={s.value} value={s.value}>
@@ -253,32 +262,32 @@ function Orders() {
 
               {/* 주문자 정보 */}
               <div>
-                <h3 className="text-sm text-gray-400 mb-3">주문자 정보</h3>
-                <div className="bg-black/50 p-4 space-y-2 text-sm">
-                  <p>{selectedOrder.user_name} ({selectedOrder.user_email})</p>
-                  <p className="text-gray-500">{selectedOrder.user_phone}</p>
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">주문자 정보</h3>
+                <div className="bg-gray-50 rounded-xl p-5 space-y-2 border border-gray-200">
+                  <p className="text-sm text-gray-700">{selectedOrder.user_name} ({selectedOrder.user_email})</p>
+                  <p className="text-sm text-gray-500">{selectedOrder.user_phone}</p>
                 </div>
               </div>
 
               {/* 배송 정보 */}
               <div>
-                <h3 className="text-sm text-gray-400 mb-3">배송 정보</h3>
-                <div className="bg-black/50 p-4 space-y-2 text-sm">
-                  <p>{selectedOrder.recipient_name} / {selectedOrder.recipient_phone}</p>
-                  <p>{selectedOrder.recipient_address} {selectedOrder.recipient_address_detail}</p>
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">배송 정보</h3>
+                <div className="bg-gray-50 rounded-xl p-5 space-y-2 border border-gray-200">
+                  <p className="text-sm text-gray-700">{selectedOrder.recipient_name} / {selectedOrder.recipient_phone}</p>
+                  <p className="text-sm text-gray-600">{selectedOrder.recipient_address} {selectedOrder.recipient_address_detail}</p>
                   {selectedOrder.memo && (
-                    <p className="text-gray-500">메모: {selectedOrder.memo}</p>
+                    <p className="text-sm text-gray-500">메모: {selectedOrder.memo}</p>
                   )}
                 </div>
               </div>
 
               {/* 주문 상품 */}
               <div>
-                <h3 className="text-sm text-gray-400 mb-3">주문 상품</h3>
-                <div className="border border-gray-800 divide-y divide-gray-800">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">주문 상품</h3>
+                <div className="border border-gray-200 rounded-xl divide-y divide-gray-200 overflow-hidden">
                   {selectedOrder.items?.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-4">
-                      <div className="w-12 h-12 bg-gray-800 overflow-hidden flex-shrink-0">
+                    <div key={item.id} className="flex gap-4 p-5 bg-white">
+                      <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 border border-gray-200">
                         {item.thumbnail ? (
                           <img
                             src={item.thumbnail}
@@ -286,19 +295,19 @@ function Orders() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
                             No img
                           </div>
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm">{item.product_name}</p>
-                        <p className="text-xs text-gray-500">
-                          ₩ {formatPrice(item.product_price)} x {item.quantity}
+                        <p className="text-sm font-medium text-gray-800">{item.product_name}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          ₩{formatPrice(item.product_price)} x {item.quantity}
                         </p>
                       </div>
-                      <div className="text-sm">
-                        ₩ {formatPrice(item.product_price * item.quantity)}
+                      <div className="text-sm font-semibold text-gray-800">
+                        ₩{formatPrice(item.product_price * item.quantity)}
                       </div>
                     </div>
                   ))}
@@ -307,23 +316,23 @@ function Orders() {
 
               {/* 결제 정보 */}
               <div>
-                <h3 className="text-sm text-gray-400 mb-3">결제 정보</h3>
-                <div className="bg-black/50 p-4 space-y-2 text-sm">
-                  <div className="flex justify-between">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">결제 정보</h3>
+                <div className="bg-gray-50 rounded-xl p-5 space-y-3 border border-gray-200">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">상품 금액</span>
-                    <span>₩ {formatPrice(selectedOrder.total_amount - selectedOrder.shipping_fee)}</span>
+                    <span className="text-gray-800 font-medium">₩{formatPrice(selectedOrder.total_amount - selectedOrder.shipping_fee)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">배송비</span>
-                    <span>
+                    <span className="text-gray-800 font-medium">
                       {selectedOrder.shipping_fee === 0
                         ? '무료'
-                        : `₩ ${formatPrice(selectedOrder.shipping_fee)}`}
+                        : `₩${formatPrice(selectedOrder.shipping_fee)}`}
                     </span>
                   </div>
-                  <div className="flex justify-between pt-2 border-t border-gray-800 text-base">
-                    <span>총 결제 금액</span>
-                    <span>₩ {formatPrice(selectedOrder.total_amount)}</span>
+                  <div className="flex justify-between pt-3 border-t border-gray-200 text-base font-semibold">
+                    <span className="text-gray-800">총 결제 금액</span>
+                    <span className="text-gray-900">₩{formatPrice(selectedOrder.total_amount)}</span>
                   </div>
                   <div className="flex justify-between pt-2 text-gray-500 text-xs">
                     <span>주문일시</span>

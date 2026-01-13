@@ -91,22 +91,26 @@ function Users() {
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-light tracking-[0.2em] mb-8">회원 관리</h1>
+    <div className="p-6 lg:p-8">
+      {/* 헤더 */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-wide text-gray-800">회원 관리</h1>
+        <p className="text-sm text-gray-500 mt-2">회원 정보를 조회하고 관리하세요</p>
+      </div>
 
       {/* 검색 */}
-      <div className="bg-[#0a0a0a] border border-gray-800 p-4 mb-6">
-        <form onSubmit={handleSearch} className="flex gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <form onSubmit={handleSearch} className="flex gap-3 items-center">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="이름 또는 이메일로 검색"
-            className="flex-1 bg-black border border-gray-700 px-4 py-2 text-sm focus:border-gray-500 focus:outline-none"
+            className="flex-1 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-500 focus:outline-none"
           />
           <button
             type="submit"
-            className="px-6 py-2 border border-gray-700 text-sm hover:border-white transition-colors"
+            className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
           >
             검색
           </button>
@@ -114,63 +118,67 @@ function Users() {
       </div>
 
       {/* 회원 목록 */}
-      <div className="bg-[#0a0a0a] border border-gray-800">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">로딩 중...</div>
+          <div className="p-12 text-center">
+            <div className="w-8 h-8 border-2 border-gray-400 border-t-gray-700 rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-gray-600 text-sm">로딩 중...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-800 text-left text-xs text-gray-500">
-                  <th className="px-6 py-4 font-normal">ID</th>
-                  <th className="px-6 py-4 font-normal">이름</th>
-                  <th className="px-6 py-4 font-normal">이메일</th>
-                  <th className="px-6 py-4 font-normal">연락처</th>
-                  <th className="px-6 py-4 font-normal">주문</th>
-                  <th className="px-6 py-4 font-normal">총 구매액</th>
-                  <th className="px-6 py-4 font-normal">역할</th>
-                  <th className="px-6 py-4 font-normal">가입일</th>
+                <tr className="border-b border-gray-200 text-left bg-gray-50">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">ID</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">이름</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">이메일</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">연락처</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">주문</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">총 구매액</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">역할</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-600">가입일</th>
                 </tr>
               </thead>
               <tbody>
                 {users.length > 0 ? (
                   users.map((user) => (
-                    <tr key={user.id} className="border-b border-gray-800/50 hover:bg-gray-900/30">
-                      <td className="px-6 py-4 text-sm text-gray-500">{user.id}</td>
-                      <td className="px-6 py-4">
+                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-5 py-3 text-sm text-gray-500">{user.id}</td>
+                      <td className="px-5 py-3">
                         <button
                           onClick={() => openUserDetail(user.id)}
-                          className="text-sm hover:text-gray-300"
+                          className="text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors"
                         >
                           {user.name}
                         </button>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">{user.email}</td>
-                      <td className="px-6 py-4 text-sm text-gray-400">{user.phone || '-'}</td>
-                      <td className="px-6 py-4 text-sm">{user.order_count}건</td>
-                      <td className="px-6 py-4 text-sm">₩ {formatPrice(user.total_spent)}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-3 text-sm text-gray-600">{user.email}</td>
+                      <td className="px-5 py-3 text-sm text-gray-600">{user.phone || '-'}</td>
+                      <td className="px-5 py-3 text-sm font-medium text-gray-800">{user.order_count}건</td>
+                      <td className="px-5 py-3 text-sm font-semibold text-gray-800">₩{formatPrice(user.total_spent)}</td>
+                      <td className="px-5 py-3">
                         <select
                           value={user.role}
                           onChange={(e) => updateRole(user.id, e.target.value)}
-                          className={`bg-black border text-xs px-2 py-1 focus:outline-none ${
+                          className={`text-xs font-medium px-2 py-1.5 pr-7 rounded-md border focus:outline-none appearance-none cursor-pointer ${
                             user.role === 'admin'
-                              ? 'border-yellow-500/50 text-yellow-500'
-                              : 'border-gray-700 text-gray-400'
+                              ? 'border-amber-300 bg-amber-50 text-amber-700'
+                              : 'border-gray-300 bg-white text-gray-700'
                           }`}
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.3rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1em 1em' }}
                         >
                           <option value="user">일반</option>
                           <option value="admin">관리자</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-5 py-3 text-sm text-gray-500">
                         {formatDate(user.created_at)}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-5 py-12 text-center text-gray-500 text-sm">
                       회원이 없습니다.
                     </td>
                   </tr>
@@ -182,15 +190,15 @@ function Users() {
 
         {/* 페이지네이션 */}
         {pagination.totalPages > 1 && (
-          <div className="flex justify-center gap-2 p-4 border-t border-gray-800">
+          <div className="flex justify-center gap-2 p-4 border-t border-gray-200 bg-gray-50">
             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => setPagination((prev) => ({ ...prev, page }))}
-                className={`w-8 h-8 text-sm ${
+                className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
                   pagination.page === page
-                    ? 'bg-white text-black'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:bg-gray-200 border border-gray-300'
                 }`}
               >
                 {page}
@@ -202,95 +210,97 @@ function Users() {
 
       {/* 회원 상세 모달 */}
       {showModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0a0a0a] border border-gray-800 w-full max-w-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-800">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-gray-50">
               <div>
-                <h2 className="text-lg font-light tracking-wider">회원 상세</h2>
+                <h2 className="text-lg font-semibold text-gray-800">회원 상세</h2>
                 <p className="text-xs text-gray-500 mt-1">{selectedUser.email}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1"
               >
-                ✕
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-8 space-y-6">
               {/* 기본 정보 */}
               <div>
-                <h3 className="text-sm text-gray-400 mb-3">기본 정보</h3>
-                <div className="bg-black/50 p-4 space-y-3 text-sm">
-                  <div className="flex justify-between">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">기본 정보</h3>
+                <div className="bg-gray-50 rounded-xl p-5 space-y-4 border border-gray-200">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">이름</span>
-                    <span>{selectedUser.name}</span>
+                    <span className="text-gray-800 font-medium">{selectedUser.name}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">이메일</span>
-                    <span>{selectedUser.email}</span>
+                    <span className="text-gray-800">{selectedUser.email}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">연락처</span>
-                    <span>{selectedUser.phone || '-'}</span>
+                    <span className="text-gray-800">{selectedUser.phone || '-'}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">주소</span>
-                    <span className="text-right">
+                    <span className="text-gray-800 text-right">
                       {selectedUser.address
                         ? `${selectedUser.address} ${selectedUser.address_detail || ''}`
                         : '-'}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">역할</span>
-                    <span className={selectedUser.role === 'admin' ? 'text-yellow-500' : ''}>
+                    <span className={selectedUser.role === 'admin' ? 'text-amber-700 font-semibold' : 'text-gray-800'}>
                       {selectedUser.role === 'admin' ? '관리자' : '일반 회원'}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-500">가입일</span>
-                    <span>{formatDate(selectedUser.created_at)}</span>
+                    <span className="text-gray-800">{formatDate(selectedUser.created_at)}</span>
                   </div>
                 </div>
               </div>
 
               {/* 최근 주문 */}
               <div>
-                <h3 className="text-sm text-gray-400 mb-3">최근 주문 (최대 10건)</h3>
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">최근 주문 (최대 10건)</h3>
                 {userOrders.length > 0 ? (
-                  <div className="border border-gray-800 divide-y divide-gray-800">
+                  <div className="border border-gray-200 rounded-xl divide-y divide-gray-200 overflow-hidden">
                     {userOrders.map((order) => (
-                      <div key={order.id} className="flex justify-between items-center p-4 text-sm">
+                      <div key={order.id} className="flex justify-between items-center p-5 bg-white">
                         <div>
-                          <p>{order.order_number}</p>
-                          <p className="text-xs text-gray-500">{formatDate(order.created_at)}</p>
+                          <p className="text-sm font-medium text-gray-800">{order.order_number}</p>
+                          <p className="text-xs text-gray-500 mt-1">{formatDate(order.created_at)}</p>
                         </div>
                         <div className="text-right">
-                          <p>₩ {formatPrice(order.total_amount)}</p>
-                          <p className="text-xs text-gray-500">{getStatusText(order.status)}</p>
+                          <p className="text-sm font-semibold text-gray-800">₩{formatPrice(order.total_amount)}</p>
+                          <p className="text-xs text-gray-500 mt-1">{getStatusText(order.status)}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">주문 내역이 없습니다.</p>
+                  <p className="text-sm text-gray-500 text-center py-10 bg-gray-50 rounded-xl border border-gray-200">주문 내역이 없습니다.</p>
                 )}
               </div>
 
               {/* 역할 변경 */}
-              <div className="flex gap-4 pt-4 border-t border-gray-800">
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
                 {selectedUser.role === 'user' ? (
                   <button
                     onClick={() => updateRole(selectedUser.id, 'admin')}
-                    className="flex-1 py-3 border border-yellow-500/50 text-yellow-500 text-sm hover:bg-yellow-500/10 transition-colors"
+                    className="flex-1 py-2.5 border border-amber-300 text-amber-700 text-sm font-medium rounded-md hover:bg-amber-50 transition-colors"
                   >
                     관리자로 변경
                   </button>
                 ) : (
                   <button
                     onClick={() => updateRole(selectedUser.id, 'user')}
-                    className="flex-1 py-3 border border-gray-700 text-gray-400 text-sm hover:border-white hover:text-white transition-colors"
+                    className="flex-1 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
                   >
                     일반 회원으로 변경
                   </button>

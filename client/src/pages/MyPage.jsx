@@ -26,8 +26,15 @@ function MyPage() {
 
   const [message, setMessage] = useState({ type: '', text: '' })
 
+  // 관리자는 Admin 페이지로 리다이렉트
   useEffect(() => {
-    if (user) {
+    if (user?.role === 'admin') {
+      navigate('/admin', { replace: true })
+    }
+  }, [user, navigate])
+
+  useEffect(() => {
+    if (user && user.role !== 'admin') {
       setProfileData({
         name: user.name || '',
         phone: user.phone || '',

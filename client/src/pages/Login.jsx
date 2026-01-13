@@ -25,8 +25,13 @@ function Login() {
     setError('')
 
     try {
-      await login(formData.email, formData.password)
-      navigate(from, { replace: true })
+      const user = await login(formData.email, formData.password)
+      // 관리자인 경우 /admin으로 리다이렉트
+      if (user?.role === 'admin') {
+        navigate('/admin', { replace: true })
+      } else {
+        navigate(from, { replace: true })
+      }
     } catch (err) {
       setError(err.response?.data?.error || '로그인에 실패했습니다.')
     } finally {

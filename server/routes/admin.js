@@ -3,6 +3,7 @@ const router = express.Router()
 const pool = require('../config/db')
 const auth = require('../middleware/auth')
 const adminAuth = require('../middleware/adminAuth')
+const upload = require('../middleware/upload')
 
 // 모든 관리자 라우트에 인증 미들웨어 적용
 router.use(auth)
@@ -260,8 +261,8 @@ router.get('/products', async (req, res) => {
   }
 })
 
-// 상품 생성
-router.post('/products', async (req, res) => {
+// 상품 생성 (이미지 업로드 지원)
+router.post('/products', upload.single('thumbnail'), async (req, res) => {
   try {
     const {
       categoryId,
@@ -279,6 +280,9 @@ router.post('/products', async (req, res) => {
       return res.status(400).json({ error: '필수 정보를 입력해주세요.' })
     }
 
+    // 파일 업로드가 있으면 파일 경로 사용, 없으면 URL 사용
+    const thumbnailPath = req.file ? `/uploads/${req.file.filename}` : (thumbnail || null)
+
     // slug 생성
     const slug = name
       .toLowerCase()
@@ -293,12 +297,13 @@ router.post('/products', async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       categoryId, name, slug, description || null, price, salePrice || null,
-      stock || 0, thumbnail || null, isActive !== false, isFeatured || false
+      stock || 0, thumbnailPath, isActive !== false, isFeatured || false
     ])
 
     res.status(201).json({
       message: '상품이 등록되었습니다.',
-      productId: result.insertId
+      productId: result.insertId,
+      thumbnail: thumbnailPath
     })
   } catch (error) {
     console.error('상품 생성 에러:', error)
@@ -306,8 +311,8 @@ router.post('/products', async (req, res) => {
   }
 })
 
-// 상품 수정
-router.put('/products/:id', async (req, res) => {
+// 상품 수정 (이미지 업로드 지원)
+router.put('/products/:id', upload.single('thumbnail'), async (req, res) => {
   try {
     const { id } = req.params
     const {
@@ -327,6 +332,9 @@ router.put('/products/:id', async (req, res) => {
       return res.status(404).json({ error: '상품을 찾을 수 없습니다.' })
     }
 
+    // 파일 업로드가 있으면 파일 경로 사용, 없으면 기존 URL 유지
+    const thumbnailPath = req.file ? `/uploads/${req.file.filename}` : thumbnail
+
     await pool.query(`
       UPDATE products SET
         category_id = COALESCE(?, category_id),
@@ -341,10 +349,10 @@ router.put('/products/:id', async (req, res) => {
       WHERE id = ?
     `, [
       categoryId, name, description, price, salePrice,
-      stock, thumbnail, isActive, isFeatured, id
+      stock, thumbnailPath, isActive, isFeatured, id
     ])
 
-    res.json({ message: '상품이 수정되었습니다.' })
+    res.json({ message: '상품이 수정되었습니다.', thumbnail: thumbnailPath })
   } catch (error) {
     console.error('상품 수정 에러:', error)
     res.status(500).json({ error: '상품 수정에 실패했습니다.' })
@@ -379,6 +387,89 @@ router.delete('/products/:id', async (req, res) => {
   } catch (error) {
     console.error('상품 삭제 에러:', error)
     res.status(500).json({ error: '상품 삭제에 실패했습니다.' })
+  }
+})
+
+// 상품 이미지 목록 조회
+router.get('/products/:id/images', async (req, res) => {
+  try {
+    const { id } = req.params
+    const [images] = await pool.query(
+      'SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order ASC',
+      [id]
+    )
+    res.json({ images })
+  } catch (error) {
+    console.error('이미지 목록 조회 에러:', error)
+    res.status(500).json({ error: '이미지 목록을 불러오는데 실패했습니다.' })
+  }
+})
+
+// 상품 이미지 추가 (최대 10개)
+router.post('/products/:id/images', upload.array('images', 10), async (req, res) => {
+  try {
+    const { id } = req.params
+    const files = req.files
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ error: '이미지 파일이 필요합니다.' })
+    }
+
+    // 현재 이미지 개수 확인
+    const [[{ count }]] = await pool.query(
+      'SELECT COUNT(*) as count FROM product_images WHERE product_id = ?',
+      [id]
+    )
+
+    if (count + files.length > 10) {
+      return res.status(400).json({ error: '상품당 최대 10개의 이미지만 등록 가능합니다.' })
+    }
+
+    // 다음 sort_order 가져오기
+    const [[{ maxOrder }]] = await pool.query(
+      'SELECT COALESCE(MAX(sort_order), -1) as maxOrder FROM product_images WHERE product_id = ?',
+      [id]
+    )
+
+    const values = files.map((file, index) => [
+      id,
+      `/uploads/${file.filename}`,
+      maxOrder + 1 + index
+    ])
+
+    await pool.query(
+      'INSERT INTO product_images (product_id, image_url, sort_order) VALUES ?',
+      [values]
+    )
+
+    // 새로 추가된 이미지 목록 반환
+    const [images] = await pool.query(
+      'SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order ASC',
+      [id]
+    )
+
+    res.status(201).json({ message: '이미지가 추가되었습니다.', images })
+  } catch (error) {
+    console.error('이미지 추가 에러:', error)
+    res.status(500).json({ error: '이미지 추가에 실패했습니다.' })
+  }
+})
+
+// 상품 이미지 삭제
+router.delete('/products/images/:imageId', async (req, res) => {
+  try {
+    const { imageId } = req.params
+
+    const [existing] = await pool.query('SELECT id FROM product_images WHERE id = ?', [imageId])
+    if (existing.length === 0) {
+      return res.status(404).json({ error: '이미지를 찾을 수 없습니다.' })
+    }
+
+    await pool.query('DELETE FROM product_images WHERE id = ?', [imageId])
+    res.json({ message: '이미지가 삭제되었습니다.' })
+  } catch (error) {
+    console.error('이미지 삭제 에러:', error)
+    res.status(500).json({ error: '이미지 삭제에 실패했습니다.' })
   }
 })
 
