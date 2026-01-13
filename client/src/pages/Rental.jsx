@@ -21,35 +21,16 @@ function Rental() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-
-    // TODO: API 연동
     await new Promise((resolve) => setTimeout(resolve, 1000))
-
     setSubmitted(true)
     setIsSubmitting(false)
   }
 
   const services = [
-    {
-      title: '기업 오피스',
-      description: '업무 공간에 자연의 활력을 더해 직원들의 창의성과 생산성을 높입니다.',
-      icon: '🏢',
-    },
-    {
-      title: '카페 & 레스토랑',
-      description: '고객에게 특별한 분위기를 선사하고 공간의 품격을 높입니다.',
-      icon: '☕',
-    },
-    {
-      title: '매장 & 쇼룸',
-      description: '브랜드의 가치를 자연과 함께 표현하여 고객 경험을 향상시킵니다.',
-      icon: '🏪',
-    },
-    {
-      title: '호텔 & 리조트',
-      description: '로비와 객실에 자연의 고요함을 담아 특별한 휴식 공간을 만듭니다.',
-      icon: '🏨',
-    },
+    { title: '기업 오피스', description: '업무 공간에 자연의 활력을 더해 직원들의 창의성과 생산성을 높입니다.', icon: '🏢' },
+    { title: '카페 & 레스토랑', description: '고객에게 특별한 분위기를 선사하고 공간의 품격을 높입니다.', icon: '☕' },
+    { title: '매장 & 쇼룸', description: '브랜드의 가치를 자연과 함께 표현하여 고객 경험을 향상시킵니다.', icon: '🏪' },
+    { title: '호텔 & 리조트', description: '로비와 객실에 자연의 고요함을 담아 특별한 휴식 공간을 만듭니다.', icon: '🏨' },
   ]
 
   const process = [
@@ -59,74 +40,45 @@ function Rental() {
     { step: '04', title: '설치 & 관리', description: '설치 후 정기적인 관리 서비스를 제공합니다.' },
   ]
 
-  return (
-    <div className="pt-20">
-      {/* 히어로 섹션 */}
-      <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: 'url(/images/rental-hero.jpg)',
-              backgroundColor: '#111',
-            }}
-          />
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
+  const inputStyle = { width: '100%', background: 'transparent', border: '1px solid #333', padding: '12px 16px', fontSize: '14px', color: '#fff' }
 
-        <div className="relative z-10 text-center px-6 max-w-3xl">
-          <p className="text-xs tracking-[0.4em] text-gray-400 mb-6">
-            FOR BUSINESS
-          </p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-wider mb-6">
-            RENTAL SERVICE
-          </h1>
-          <p className="text-gray-300 leading-relaxed">
-            공간에 자연을 더하는 테라리움 렌탈 서비스
-          </p>
+  return (
+    <div style={{ paddingTop: '80px' }}>
+      {/* 히어로 섹션 */}
+      <section style={{ height: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '24px' }}>FOR BUSINESS</p>
+          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px' }}>RENTAL SERVICE</h1>
+          <p style={{ color: '#888' }}>공간에 자연을 더하는 테라리움 렌탈 서비스</p>
         </div>
       </section>
 
       {/* 소개 섹션 */}
-      <section className="py-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-extralight tracking-wider leading-relaxed mb-8">
-            비즈니스 공간에<br />
-            자연의 감성을 더합니다
+      <section style={{ padding: '100px 80px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: 200, marginBottom: '32px', lineHeight: 1.6 }}>
+            비즈니스 공간에<br />자연의 감성을 더합니다
           </h2>
-          <p className="text-gray-500 leading-loose">
-            구의정원의 렌탈 서비스는 기업, 카페, 매장 등 다양한 비즈니스 공간에<br className="hidden md:block" />
-            맞춤형 테라리움을 제공합니다. 설치부터 정기 관리까지<br className="hidden md:block" />
-            전문가가 직접 케어합니다.
+          <p style={{ color: '#888', lineHeight: 1.8 }}>
+            구의정원의 렌탈 서비스는 기업, 카페, 매장 등 다양한 비즈니스 공간에
+            맞춤형 테라리움을 제공합니다. 설치부터 정기 관리까지 전문가가 직접 케어합니다.
           </p>
         </div>
       </section>
 
       {/* 서비스 대상 */}
-      <section className="py-20 px-6 bg-[#0a0a0a]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs tracking-[0.4em] text-gray-500 mb-4">
-              SERVICE FOR
-            </p>
-            <h2 className="text-2xl font-extralight tracking-[0.15em]">
-              이런 공간에 추천합니다
-            </h2>
+      <section style={{ padding: '80px 80px', background: '#0a0a0a' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>SERVICE FOR</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>이런 공간에 추천합니다</h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
             {services.map((service, index) => (
-              <div
-                key={index}
-                className="p-8 border border-gray-800 hover:border-gray-700 transition-colors"
-              >
-                <div className="text-3xl mb-6">{service.icon}</div>
-                <h3 className="text-lg font-light tracking-wider mb-4">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {service.description}
-                </p>
+              <div key={index} style={{ padding: '32px', border: '1px solid #333' }}>
+                <div style={{ fontSize: '32px', marginBottom: '24px' }}>{service.icon}</div>
+                <h3 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '16px' }}>{service.title}</h3>
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>{service.description}</p>
               </div>
             ))}
           </div>
@@ -134,29 +86,18 @@ function Rental() {
       </section>
 
       {/* 프로세스 */}
-      <section className="py-32 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs tracking-[0.4em] text-gray-500 mb-4">
-              PROCESS
-            </p>
-            <h2 className="text-2xl font-extralight tracking-[0.15em]">
-              렌탈 진행 과정
-            </h2>
+      <section style={{ padding: '100px 80px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>PROCESS</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>렌탈 진행 과정</h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
             {process.map((item, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl font-extralight text-gray-600 mb-4">
-                  {item.step}
-                </div>
-                <h3 className="text-lg font-light tracking-wider mb-3">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  {item.description}
-                </p>
+              <div key={index} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '32px', fontWeight: 200, color: '#666', marginBottom: '16px' }}>{item.step}</div>
+                <h3 style={{ fontSize: '18px', fontWeight: 300, marginBottom: '12px' }}>{item.title}</h3>
+                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>{item.description}</p>
               </div>
             ))}
           </div>
@@ -164,131 +105,75 @@ function Rental() {
       </section>
 
       {/* 문의 폼 */}
-      <section className="py-32 px-6 bg-[#0a0a0a]">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.4em] text-gray-500 mb-4">
-              INQUIRY
-            </p>
-            <h2 className="text-2xl font-extralight tracking-[0.15em]">
-              렌탈 문의하기
-            </h2>
+      <section style={{ padding: '100px 80px', background: '#0a0a0a' }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>INQUIRY</p>
+            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>렌탈 문의하기</h2>
           </div>
 
           {submitted ? (
-            <div className="text-center py-16">
-              <p className="text-xl font-light mb-4">문의가 접수되었습니다</p>
-              <p className="text-gray-500">
-                빠른 시일 내에 연락드리겠습니다.
-              </p>
+            <div style={{ textAlign: 'center', padding: '64px 0' }}>
+              <p style={{ fontSize: '20px', fontWeight: 300, marginBottom: '16px' }}>문의가 접수되었습니다</p>
+              <p style={{ color: '#888' }}>빠른 시일 내에 연락드리겠습니다.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 <div>
-                  <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                    이름 *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors"
-                  />
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>이름 *</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} required style={inputStyle} />
                 </div>
                 <div>
-                  <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                    회사명
-                  </label>
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors"
-                  />
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>회사명</label>
+                  <input type="text" name="company" value={formData.company} onChange={handleChange} style={inputStyle} />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 <div>
-                  <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                    이메일 *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors"
-                  />
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>이메일 *</label>
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} required style={inputStyle} />
                 </div>
                 <div>
-                  <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                    연락처 *
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors"
-                  />
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>연락처 *</label>
+                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required style={inputStyle} />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 <div>
-                  <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                    설치 위치
-                  </label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="예: 서울시 강남구"
-                    className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors placeholder:text-gray-700"
-                  />
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>설치 위치</label>
+                  <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="예: 서울시 강남구" style={inputStyle} />
                 </div>
                 <div>
-                  <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                    공간 규모
-                  </label>
-                  <input
-                    type="text"
-                    name="spaceSize"
-                    value={formData.spaceSize}
-                    onChange={handleChange}
-                    placeholder="예: 약 30평"
-                    className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors placeholder:text-gray-700"
-                  />
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>공간 규모</label>
+                  <input type="text" name="spaceSize" value={formData.spaceSize} onChange={handleChange} placeholder="예: 약 30평" style={inputStyle} />
                 </div>
               </div>
-
               <div>
-                <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                  문의 내용
-                </label>
+                <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>문의 내용</label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows={5}
                   placeholder="원하시는 스타일이나 궁금한 점을 자유롭게 작성해주세요."
-                  className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors resize-none placeholder:text-gray-700"
+                  style={{ ...inputStyle, resize: 'none' }}
                 />
               </div>
-
-              <div className="text-center pt-4">
+              <div style={{ textAlign: 'center', paddingTop: '16px' }}>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="border border-white px-12 py-4 text-xs tracking-[0.3em] hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    border: '1px solid #fff',
+                    background: 'transparent',
+                    color: '#fff',
+                    padding: '16px 48px',
+                    fontSize: '12px',
+                    letterSpacing: '0.3em',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    opacity: isSubmitting ? 0.5 : 1,
+                  }}
                 >
                   {isSubmitting ? 'SUBMITTING...' : 'SUBMIT'}
                 </button>

@@ -22,59 +22,51 @@ function OrderComplete() {
     }
   }
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('ko-KR').format(price)
-  }
+  const formatPrice = (price) => new Intl.NumberFormat('ko-KR').format(price)
 
   if (loading) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">로딩 중...</p>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888' }}>로딩 중...</p>
       </div>
     )
   }
 
   if (!order) {
     return (
-      <div className="pt-20 min-h-screen flex flex-col items-center justify-center">
-        <p className="text-gray-500 mb-4">주문 정보를 찾을 수 없습니다.</p>
-        <Link to="/" className="text-sm text-gray-400 hover:text-white">
-          홈으로 돌아가기
-        </Link>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888', marginBottom: '16px' }}>주문 정보를 찾을 수 없습니다.</p>
+        <Link to="/" style={{ fontSize: '14px', color: '#888' }}>홈으로 돌아가기</Link>
       </div>
     )
   }
 
   return (
-    <div className="pt-20 min-h-screen">
-      <div className="max-w-2xl mx-auto px-6 py-16">
+    <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '64px 80px' }}>
         {/* 완료 메시지 */}
-        <div className="text-center mb-12">
-          <div className="w-16 h-16 mx-auto mb-6 border-2 border-white rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ width: '64px', height: '64px', margin: '0 auto 24px', border: '2px solid #fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '24px' }}>✓</span>
           </div>
-          <h1 className="text-2xl font-light tracking-[0.2em] mb-4">주문 완료</h1>
-          <p className="text-gray-500">주문이 성공적으로 접수되었습니다.</p>
+          <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', marginBottom: '16px' }}>주문 완료</h1>
+          <p style={{ color: '#888' }}>주문이 성공적으로 접수되었습니다.</p>
         </div>
 
         {/* 주문 정보 */}
-        <div className="border border-gray-800 p-8 mb-8">
-          <div className="text-center mb-8 pb-8 border-b border-gray-800">
-            <p className="text-xs text-gray-500 mb-2">주문번호</p>
-            <p className="text-lg tracking-wider">{order.order_number}</p>
+        <div style={{ border: '1px solid #333', padding: '32px', marginBottom: '32px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px', paddingBottom: '32px', borderBottom: '1px solid #333' }}>
+            <p style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>주문번호</p>
+            <p style={{ fontSize: '18px', letterSpacing: '0.1em' }}>{order.order_number}</p>
           </div>
 
           {/* 주문 상품 */}
-          <div className="mb-8">
-            <h3 className="text-sm tracking-wider text-gray-400 mb-4">주문 상품</h3>
-            <div className="space-y-3">
+          <div style={{ marginBottom: '32px' }}>
+            <h3 style={{ fontSize: '14px', letterSpacing: '0.1em', color: '#888', marginBottom: '16px' }}>주문 상품</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {order.items?.map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
-                  <span>
-                    {item.product_name} x {item.quantity}
-                  </span>
+                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                  <span>{item.product_name} x {item.quantity}</span>
                   <span>₩ {formatPrice(item.product_price * item.quantity)}</span>
                 </div>
               ))}
@@ -82,33 +74,28 @@ function OrderComplete() {
           </div>
 
           {/* 배송 정보 */}
-          <div className="mb-8">
-            <h3 className="text-sm tracking-wider text-gray-400 mb-4">배송 정보</h3>
-            <div className="space-y-2 text-sm text-gray-300">
+          <div style={{ marginBottom: '32px' }}>
+            <h3 style={{ fontSize: '14px', letterSpacing: '0.1em', color: '#888', marginBottom: '16px' }}>배송 정보</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', color: '#ccc' }}>
               <p>{order.recipient_name}</p>
               <p>{order.recipient_phone}</p>
-              <p>
-                {order.recipient_address}
-                {order.recipient_address_detail && ` ${order.recipient_address_detail}`}
-              </p>
-              {order.memo && <p className="text-gray-500">메모: {order.memo}</p>}
+              <p>{order.recipient_address}{order.recipient_address_detail && ` ${order.recipient_address_detail}`}</p>
+              {order.memo && <p style={{ color: '#888' }}>메모: {order.memo}</p>}
             </div>
           </div>
 
           {/* 결제 정보 */}
-          <div className="pt-6 border-t border-gray-800">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">상품 금액</span>
+          <div style={{ paddingTop: '24px', borderTop: '1px solid #333' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                <span style={{ color: '#888' }}>상품 금액</span>
                 <span>₩ {formatPrice(order.total_amount - order.shipping_fee)}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">배송비</span>
-                <span>
-                  {order.shipping_fee === 0 ? '무료' : `₩ ${formatPrice(order.shipping_fee)}`}
-                </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                <span style={{ color: '#888' }}>배송비</span>
+                <span>{order.shipping_fee === 0 ? '무료' : `₩ ${formatPrice(order.shipping_fee)}`}</span>
               </div>
-              <div className="flex justify-between text-lg pt-4 border-t border-gray-800">
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', paddingTop: '16px', borderTop: '1px solid #333' }}>
                 <span>총 결제 금액</span>
                 <span>₩ {formatPrice(order.total_amount)}</span>
               </div>
@@ -117,17 +104,11 @@ function OrderComplete() {
         </div>
 
         {/* 버튼 */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link
-            to="/mypage"
-            className="flex-1 py-4 border border-white text-center text-sm tracking-[0.2em] hover:bg-white hover:text-black transition-colors"
-          >
+        <div style={{ display: 'flex', gap: '16px' }}>
+          <Link to="/mypage" style={{ flex: 1, padding: '16px', border: '1px solid #fff', textAlign: 'center', fontSize: '14px', letterSpacing: '0.2em' }}>
             주문 내역 보기
           </Link>
-          <Link
-            to="/"
-            className="flex-1 py-4 bg-white text-black text-center text-sm tracking-[0.2em] hover:bg-gray-200 transition-colors"
-          >
+          <Link to="/" style={{ flex: 1, padding: '16px', background: '#fff', color: '#000', textAlign: 'center', fontSize: '14px', letterSpacing: '0.2em' }}>
             쇼핑 계속하기
           </Link>
         </div>

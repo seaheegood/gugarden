@@ -69,7 +69,6 @@ function MyPage() {
   const handleProfileSubmit = async (e) => {
     e.preventDefault()
     setMessage({ type: '', text: '' })
-
     try {
       await api.put('/auth/me', profileData)
       updateUser(profileData)
@@ -82,12 +81,10 @@ function MyPage() {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault()
     setMessage({ type: '', text: '' })
-
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setMessage({ type: 'error', text: '새 비밀번호가 일치하지 않습니다.' })
       return
     }
-
     try {
       await api.put('/auth/password', {
         currentPassword: passwordData.currentPassword,
@@ -105,13 +102,8 @@ function MyPage() {
     navigate('/')
   }
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('ko-KR').format(price)
-  }
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('ko-KR')
-  }
+  const formatPrice = (price) => new Intl.NumberFormat('ko-KR').format(price)
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ko-KR')
 
   const getStatusText = (status) => {
     const statusMap = {
@@ -131,25 +123,30 @@ function MyPage() {
     { id: 'password', label: '비밀번호 변경' },
   ]
 
+  const inputStyle = { width: '100%', background: 'transparent', border: '1px solid #333', padding: '12px 16px', fontSize: '14px', color: '#fff' }
+
   return (
-    <div className="pt-20 min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-2xl font-light tracking-[0.2em] text-center mb-12">MY PAGE</h1>
+    <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '64px 80px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', textAlign: 'center', marginBottom: '48px' }}>MY PAGE</h1>
 
         {/* 탭 메뉴 */}
-        <div className="flex justify-center gap-8 mb-12 border-b border-gray-800">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', marginBottom: '48px', borderBottom: '1px solid #333', paddingBottom: '16px' }}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id)
-                setMessage({ type: '', text: '' })
+              onClick={() => { setActiveTab(tab.id); setMessage({ type: '', text: '' }) }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: activeTab === tab.id ? '#fff' : '#888',
+                fontSize: '14px',
+                letterSpacing: '0.1em',
+                cursor: 'pointer',
+                borderBottom: activeTab === tab.id ? '2px solid #fff' : '2px solid transparent',
+                paddingBottom: '16px',
+                marginBottom: '-17px',
               }}
-              className={`pb-4 text-sm tracking-wider transition-colors ${
-                activeTab === tab.id
-                  ? 'text-white border-b-2 border-white'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
             >
               {tab.label}
             </button>
@@ -158,93 +155,49 @@ function MyPage() {
 
         {/* 메시지 */}
         {message.text && (
-          <div
-            className={`mb-8 p-4 text-sm text-center ${
-              message.type === 'success'
-                ? 'bg-green-500/10 border border-green-500/20 text-green-400'
-                : 'bg-red-500/10 border border-red-500/20 text-red-400'
-            }`}
-          >
+          <div style={{
+            marginBottom: '32px',
+            padding: '16px',
+            textAlign: 'center',
+            fontSize: '14px',
+            background: message.type === 'success' ? 'rgba(0,255,0,0.1)' : 'rgba(255,0,0,0.1)',
+            border: `1px solid ${message.type === 'success' ? 'rgba(0,255,0,0.2)' : 'rgba(255,0,0,0.2)'}`,
+            color: message.type === 'success' ? '#66ff66' : '#ff6666',
+          }}>
             {message.text}
           </div>
         )}
 
         {/* 회원정보 탭 */}
         {activeTab === 'profile' && (
-          <form onSubmit={handleProfileSubmit} className="space-y-6">
+          <form onSubmit={handleProfileSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">이메일</label>
-              <input
-                type="email"
-                value={user?.email || ''}
-                disabled
-                className="w-full bg-gray-900 border border-gray-800 px-4 py-3 text-sm text-gray-500"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>이메일</label>
+              <input type="email" value={user?.email || ''} disabled style={{ ...inputStyle, color: '#666', background: '#111' }} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">이름</label>
-              <input
-                type="text"
-                name="name"
-                value={profileData.name}
-                onChange={handleProfileChange}
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>이름</label>
+              <input type="text" name="name" value={profileData.name} onChange={handleProfileChange} style={inputStyle} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">연락처</label>
-              <input
-                type="tel"
-                name="phone"
-                value={profileData.phone}
-                onChange={handleProfileChange}
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>연락처</label>
+              <input type="tel" name="phone" value={profileData.phone} onChange={handleProfileChange} style={inputStyle} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">우편번호</label>
-              <input
-                type="text"
-                name="zipcode"
-                value={profileData.zipcode}
-                onChange={handleProfileChange}
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>우편번호</label>
+              <input type="text" name="zipcode" value={profileData.zipcode} onChange={handleProfileChange} style={inputStyle} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">주소</label>
-              <input
-                type="text"
-                name="address"
-                value={profileData.address}
-                onChange={handleProfileChange}
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>주소</label>
+              <input type="text" name="address" value={profileData.address} onChange={handleProfileChange} style={inputStyle} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">상세주소</label>
-              <input
-                type="text"
-                name="address_detail"
-                value={profileData.address_detail}
-                onChange={handleProfileChange}
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>상세주소</label>
+              <input type="text" name="address_detail" value={profileData.address_detail} onChange={handleProfileChange} style={inputStyle} />
             </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                className="w-full py-4 border border-white text-sm tracking-[0.2em] hover:bg-white hover:text-black transition-colors"
-              >
-                정보 수정
-              </button>
-            </div>
+            <button type="submit" style={{ width: '100%', padding: '16px', border: '1px solid #fff', background: 'transparent', color: '#fff', fontSize: '14px', letterSpacing: '0.2em', cursor: 'pointer', marginTop: '16px' }}>
+              정보 수정
+            </button>
           </form>
         )}
 
@@ -252,36 +205,28 @@ function MyPage() {
         {activeTab === 'orders' && (
           <div>
             {loading ? (
-              <p className="text-center text-gray-500 py-12">로딩 중...</p>
+              <p style={{ textAlign: 'center', color: '#888', padding: '48px 0' }}>로딩 중...</p>
             ) : orders.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">주문 내역이 없습니다.</p>
-                <Link
-                  to="/terrarium"
-                  className="inline-block border border-gray-700 px-8 py-3 text-sm tracking-wider hover:border-white transition-colors"
-                >
+              <div style={{ textAlign: 'center', padding: '48px 0' }}>
+                <p style={{ color: '#888', marginBottom: '16px' }}>주문 내역이 없습니다.</p>
+                <Link to="/terrarium" style={{ border: '1px solid #444', padding: '12px 32px', fontSize: '14px', letterSpacing: '0.1em', color: '#888' }}>
                   쇼핑하러 가기
                 </Link>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {orders.map((order) => (
-                  <div key={order.id} className="border border-gray-800 p-6">
-                    <div className="flex justify-between items-start mb-4">
+                  <div key={order.id} style={{ border: '1px solid #333', padding: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                       <div>
-                        <p className="text-xs text-gray-500 mb-1">{formatDate(order.created_at)}</p>
-                        <p className="text-sm">주문번호: {order.order_number}</p>
+                        <p style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{formatDate(order.created_at)}</p>
+                        <p style={{ fontSize: '14px' }}>주문번호: {order.order_number}</p>
                       </div>
-                      <span className="text-xs px-3 py-1 bg-gray-800">{getStatusText(order.status)}</span>
+                      <span style={{ fontSize: '12px', padding: '4px 12px', background: '#222' }}>{getStatusText(order.status)}</span>
                     </div>
-                    <div className="flex justify-between items-center pt-4 border-t border-gray-800">
-                      <p className="text-lg">₩ {formatPrice(order.total_amount)}</p>
-                      <Link
-                        to={`/order/${order.id}`}
-                        className="text-xs text-gray-400 hover:text-white transition-colors"
-                      >
-                        상세보기
-                      </Link>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid #333' }}>
+                      <p style={{ fontSize: '18px' }}>₩ {formatPrice(order.total_amount)}</p>
+                      <Link to={`/order/${order.id}`} style={{ fontSize: '12px', color: '#888' }}>상세보기</Link>
                     </div>
                   </div>
                 ))}
@@ -292,61 +237,28 @@ function MyPage() {
 
         {/* 비밀번호 변경 탭 */}
         {activeTab === 'password' && (
-          <form onSubmit={handlePasswordSubmit} className="space-y-6">
+          <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">현재 비밀번호</label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={passwordData.currentPassword}
-                onChange={handlePasswordChange}
-                required
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>현재 비밀번호</label>
+              <input type="password" name="currentPassword" value={passwordData.currentPassword} onChange={handlePasswordChange} required style={inputStyle} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">새 비밀번호</label>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-                required
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                placeholder="6자 이상"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>새 비밀번호</label>
+              <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} required placeholder="6자 이상" style={inputStyle} />
             </div>
-
             <div>
-              <label className="block text-xs tracking-wider text-gray-400 mb-2">새 비밀번호 확인</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-                required
-                className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-              />
+              <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>새 비밀번호 확인</label>
+              <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} required style={inputStyle} />
             </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                className="w-full py-4 border border-white text-sm tracking-[0.2em] hover:bg-white hover:text-black transition-colors"
-              >
-                비밀번호 변경
-              </button>
-            </div>
+            <button type="submit" style={{ width: '100%', padding: '16px', border: '1px solid #fff', background: 'transparent', color: '#fff', fontSize: '14px', letterSpacing: '0.2em', cursor: 'pointer', marginTop: '16px' }}>
+              비밀번호 변경
+            </button>
           </form>
         )}
 
         {/* 로그아웃 버튼 */}
-        <div className="mt-12 pt-8 border-t border-gray-800 text-center">
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-500 hover:text-white transition-colors"
-          >
+        <div style={{ marginTop: '48px', paddingTop: '32px', borderTop: '1px solid #333', textAlign: 'center' }}>
+          <button onClick={handleLogout} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '14px', cursor: 'pointer' }}>
             로그아웃
           </button>
         </div>

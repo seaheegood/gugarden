@@ -32,7 +32,6 @@ function Cart() {
 
   const updateQuantity = async (id, quantity) => {
     if (quantity < 1) return
-
     try {
       await api.put(`/cart/${id}`, { quantity })
       fetchCart()
@@ -43,7 +42,6 @@ function Cart() {
 
   const removeItem = async (id) => {
     if (!confirm('장바구니에서 삭제하시겠습니까?')) return
-
     try {
       await api.delete(`/cart/${id}`)
       fetchCart()
@@ -61,12 +59,9 @@ function Cart() {
 
   if (!isAuthenticated) {
     return (
-      <div className="pt-20 min-h-screen flex flex-col items-center justify-center px-6">
-        <p className="text-gray-500 mb-6">로그인이 필요합니다.</p>
-        <Link
-          to="/login"
-          className="border border-white px-8 py-3 text-sm tracking-wider hover:bg-white hover:text-black transition-colors"
-        >
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888', marginBottom: '24px' }}>로그인이 필요합니다.</p>
+        <Link to="/login" style={{ border: '1px solid #fff', padding: '12px 32px', fontSize: '14px', letterSpacing: '0.1em' }}>
           로그인
         </Link>
       </div>
@@ -75,132 +70,82 @@ function Cart() {
 
   if (loading) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">로딩 중...</p>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888' }}>로딩 중...</p>
       </div>
     )
   }
 
   return (
-    <div className="pt-20 min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-2xl font-light tracking-[0.2em] text-center mb-12">CART</h1>
+    <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '64px 80px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', textAlign: 'center', marginBottom: '48px' }}>CART</h1>
 
         {items.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-gray-500 mb-8">장바구니가 비어있습니다.</p>
-            <Link
-              to="/terrarium"
-              className="inline-block border border-gray-700 px-8 py-3 text-sm tracking-wider hover:border-white transition-colors"
-            >
+          <div style={{ textAlign: 'center', padding: '64px 0' }}>
+            <p style={{ color: '#888', marginBottom: '32px' }}>장바구니가 비어있습니다.</p>
+            <Link to="/terrarium" style={{ border: '1px solid #444', padding: '12px 32px', fontSize: '14px', letterSpacing: '0.1em', color: '#888' }}>
               쇼핑하러 가기
             </Link>
           </div>
         ) : (
           <>
             {/* 장바구니 목록 */}
-            <div className="space-y-6 mb-12">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '48px' }}>
               {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex gap-6 p-6 border border-gray-800"
-                >
-                  {/* 이미지 */}
-                  <Link to={`/product/${item.product_id}`} className="flex-shrink-0">
-                    <div className="w-24 h-24 bg-[#1a1a1a] overflow-hidden">
-                      <img
-                        src={item.thumbnail || '/images/placeholder.jpg'}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.src = '/images/placeholder.jpg'
-                        }}
-                      />
+                <div key={item.id} style={{ display: 'flex', gap: '24px', padding: '24px', border: '1px solid #333' }}>
+                  <Link to={`/product/${item.product_id}`}>
+                    <div style={{ width: '96px', height: '96px', background: '#1a1a1a', overflow: 'hidden' }}>
+                      <img src={item.thumbnail || '/images/placeholder.jpg'} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                   </Link>
-
-                  {/* 정보 */}
-                  <div className="flex-1 flex flex-col justify-between">
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
-                      <Link
-                        to={`/product/${item.product_id}`}
-                        className="text-sm font-light tracking-wider hover:text-gray-400"
-                      >
+                      <Link to={`/product/${item.product_id}`} style={{ fontSize: '14px', fontWeight: 300, letterSpacing: '0.1em' }}>
                         {item.name}
                       </Link>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p style={{ fontSize: '14px', color: '#888', marginTop: '4px' }}>
                         ₩ {formatPrice(item.sale_price || item.price)}
                       </p>
                     </div>
-
-                    {/* 수량 & 삭제 */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="w-8 h-8 border border-gray-700 flex items-center justify-center hover:border-white transition-colors"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center text-sm">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 border border-gray-700 flex items-center justify-center hover:border-white transition-colors"
-                        >
-                          +
-                        </button>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ width: '32px', height: '32px', border: '1px solid #444', background: 'transparent', color: '#fff', cursor: 'pointer' }}>-</button>
+                        <span style={{ width: '32px', textAlign: 'center', fontSize: '14px' }}>{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ width: '32px', height: '32px', border: '1px solid #444', background: 'transparent', color: '#fff', cursor: 'pointer' }}>+</button>
                       </div>
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-xs text-gray-500 hover:text-white transition-colors"
-                      >
-                        삭제
-                      </button>
+                      <button onClick={() => removeItem(item.id)} style={{ fontSize: '12px', color: '#888', background: 'transparent', border: 'none', cursor: 'pointer' }}>삭제</button>
                     </div>
                   </div>
-
-                  {/* 소계 */}
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-sm">
-                      ₩ {formatPrice((item.sale_price || item.price) * item.quantity)}
-                    </p>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '14px' }}>₩ {formatPrice((item.sale_price || item.price) * item.quantity)}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* 주문 요약 */}
-            <div className="border-t border-gray-800 pt-8">
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">상품 금액</span>
+            <div style={{ borderTop: '1px solid #333', paddingTop: '32px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                  <span style={{ color: '#888' }}>상품 금액</span>
                   <span>₩ {formatPrice(totalAmount)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">배송비</span>
-                  <span>
-                    {shippingFee === 0 ? (
-                      '무료'
-                    ) : (
-                      `₩ ${formatPrice(shippingFee)}`
-                    )}
-                  </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                  <span style={{ color: '#888' }}>배송비</span>
+                  <span>{shippingFee === 0 ? '무료' : `₩ ${formatPrice(shippingFee)}`}</span>
                 </div>
                 {totalAmount < 50000 && (
-                  <p className="text-xs text-gray-600">
-                    ₩ {formatPrice(50000 - totalAmount)} 더 구매 시 무료배송
-                  </p>
+                  <p style={{ fontSize: '12px', color: '#666' }}>₩ {formatPrice(50000 - totalAmount)} 더 구매 시 무료배송</p>
                 )}
-                <div className="flex justify-between text-lg pt-4 border-t border-gray-800">
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', paddingTop: '16px', borderTop: '1px solid #333' }}>
                   <span>총 결제 금액</span>
                   <span>₩ {formatPrice(finalAmount)}</span>
                 </div>
               </div>
-
-              {/* 주문 버튼 */}
               <button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-4 bg-white text-black text-sm tracking-[0.2em] hover:bg-gray-200 transition-colors"
+                style={{ width: '100%', padding: '16px', background: '#fff', color: '#000', fontSize: '14px', letterSpacing: '0.2em', border: 'none', cursor: 'pointer' }}
               >
                 주문하기
               </button>

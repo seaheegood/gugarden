@@ -2,16 +2,16 @@ import { Link } from 'react-router-dom'
 
 function Footer() {
   return (
-    <footer className="bg-[#0a0a0a] border-t border-gray-900">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <footer style={{ background: '#0a0a0a', borderTop: '1px solid #222' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 80px' }}>
         {/* 메인 푸터 */}
-        <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div style={{ padding: '80px 0', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '48px' }}>
           {/* 브랜드 */}
-          <div className="lg:col-span-1">
-            <Link to="/" className="text-xl font-light tracking-[0.3em]">
+          <div>
+            <Link to="/" style={{ fontSize: '20px', fontWeight: 300, letterSpacing: '0.3em' }}>
               구의정원
             </Link>
-            <p className="mt-6 text-sm text-gray-500 leading-relaxed">
+            <p style={{ marginTop: '24px', fontSize: '14px', color: '#888', lineHeight: 1.8 }}>
               자연을 담은 작은 정원,<br />
               테라리움과 비바리움 전문 브랜드
             </p>
@@ -19,39 +19,27 @@ function Footer() {
 
           {/* 쇼핑 */}
           <div>
-            <h4 className="text-xs font-medium tracking-[0.2em] text-gray-400 mb-6">
+            <h4 style={{ fontSize: '12px', letterSpacing: '0.2em', color: '#666', marginBottom: '24px' }}>
               SHOP
             </h4>
-            <ul className="space-y-3">
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
-                <Link
-                  to="/terrarium"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/terrarium" style={{ fontSize: '14px', color: '#888' }}>
                   Terrarium
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/vivarium"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/vivarium" style={{ fontSize: '14px', color: '#888' }}>
                   Vivarium
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/kit"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/kit" style={{ fontSize: '14px', color: '#888' }}>
                   Kit
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/rental"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/rental" style={{ fontSize: '14px', color: '#888' }}>
                   Rental Service
                 </Link>
               </li>
@@ -60,39 +48,27 @@ function Footer() {
 
           {/* 고객 지원 */}
           <div>
-            <h4 className="text-xs font-medium tracking-[0.2em] text-gray-400 mb-6">
+            <h4 style={{ fontSize: '12px', letterSpacing: '0.2em', color: '#666', marginBottom: '24px' }}>
               SUPPORT
             </h4>
-            <ul className="space-y-3">
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
-                <Link
-                  to="/about"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/about" style={{ fontSize: '14px', color: '#888' }}>
                   About Us
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/faq"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/faq" style={{ fontSize: '14px', color: '#888' }}>
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/shipping"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/shipping" style={{ fontSize: '14px', color: '#888' }}>
                   Shipping & Returns
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/contact"
-                  className="text-sm text-gray-500 hover:text-white transition-colors"
-                >
+                <Link to="/contact" style={{ fontSize: '14px', color: '#888' }}>
                   Contact
                 </Link>
               </li>
@@ -101,56 +77,40 @@ function Footer() {
 
           {/* 연락처 */}
           <div>
-            <h4 className="text-xs font-medium tracking-[0.2em] text-gray-400 mb-6">
+            <h4 style={{ fontSize: '12px', letterSpacing: '0.2em', color: '#666', marginBottom: '24px' }}>
               CONTACT
             </h4>
-            <ul className="space-y-3 text-sm text-gray-500">
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#888' }}>
               <li>
-                <a
-                  href="mailto:hello@gugarden.com"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="mailto:hello@gugarden.com">
                   hello@gugarden.com
                 </a>
               </li>
               <li>
-                <a
-                  href="tel:02-0000-0000"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="tel:02-0000-0000">
                   02-0000-0000
                 </a>
               </li>
-              <li className="pt-2">
-                <p className="leading-relaxed">
-                  서울특별시 광진구<br />
-                  구의동 000-00
-                </p>
+              <li style={{ paddingTop: '8px', lineHeight: 1.6 }}>
+                서울특별시 광진구<br />
+                구의동 000-00
               </li>
             </ul>
           </div>
         </div>
 
         {/* 하단 */}
-        <div className="py-6 border-t border-gray-900">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-600">
-              &copy; 2025 구의정원. All rights reserved.
-            </p>
-            <div className="flex gap-6">
-              <Link
-                to="/privacy"
-                className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
-              >
-                개인정보처리방침
-              </Link>
-              <Link
-                to="/terms"
-                className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
-              >
-                이용약관
-              </Link>
-            </div>
+        <div style={{ padding: '24px 0', borderTop: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p style={{ fontSize: '12px', color: '#555' }}>
+            &copy; 2025 구의정원. All rights reserved.
+          </p>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <Link to="/privacy" style={{ fontSize: '12px', color: '#555' }}>
+              개인정보처리방침
+            </Link>
+            <Link to="/terms" style={{ fontSize: '12px', color: '#555' }}>
+              이용약관
+            </Link>
           </div>
         </div>
       </div>

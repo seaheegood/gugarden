@@ -7,10 +7,7 @@ function Login() {
   const location = useLocation()
   const { login } = useAuth()
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const [formData, setFormData] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -37,66 +34,56 @@ function Login() {
     }
   }
 
+  const inputStyle = { width: '100%', background: 'transparent', border: '1px solid #333', padding: '12px 16px', fontSize: '14px', color: '#fff' }
+
   return (
-    <div className="pt-20 min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-12">
-          <h1 className="text-2xl font-light tracking-[0.2em] mb-4">LOGIN</h1>
-          <p className="text-sm text-gray-500">구의정원에 오신 것을 환영합니다</p>
+    <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '400px', padding: '0 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', marginBottom: '16px' }}>LOGIN</h1>
+          <p style={{ fontSize: '14px', color: '#888' }}>구의정원에 오신 것을 환영합니다</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {error && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+            <div style={{ padding: '16px', background: 'rgba(255,0,0,0.1)', border: '1px solid rgba(255,0,0,0.2)', color: '#ff6666', fontSize: '14px', textAlign: 'center' }}>
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-xs tracking-wider text-gray-400 mb-2">
-              이메일
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors"
-              placeholder="example@email.com"
-            />
+            <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>이메일</label>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="example@email.com" style={inputStyle} />
           </div>
 
           <div>
-            <label className="block text-xs tracking-wider text-gray-400 mb-2">
-              비밀번호
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none transition-colors"
-              placeholder="••••••••"
-            />
+            <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>비밀번호</label>
+            <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="••••••••" style={inputStyle} />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-white text-black text-sm tracking-[0.2em] hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              width: '100%',
+              padding: '16px',
+              background: '#fff',
+              color: '#000',
+              fontSize: '14px',
+              letterSpacing: '0.2em',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.5 : 1,
+            }}
           >
             {loading ? 'LOADING...' : 'LOGIN'}
           </button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+        <div style={{ marginTop: '32px', textAlign: 'center' }}>
+          <p style={{ fontSize: '14px', color: '#888' }}>
             아직 회원이 아니신가요?{' '}
-            <Link to="/register" className="text-white hover:text-gray-400 transition-colors">
-              회원가입
-            </Link>
+            <Link to="/register" style={{ color: '#fff' }}>회원가입</Link>
           </p>
         </div>
       </div>

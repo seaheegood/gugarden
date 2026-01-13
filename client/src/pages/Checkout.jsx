@@ -48,7 +48,6 @@ function Checkout() {
       setItems(response.data.items)
       setTotalAmount(response.data.totalAmount)
     } catch (error) {
-      console.error('장바구니 조회 에러:', error)
       navigate('/cart')
     } finally {
       setLoading(false)
@@ -65,16 +64,12 @@ function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
     if (!formData.recipientName || !formData.recipientPhone || !formData.recipientAddress) {
       alert('배송 정보를 모두 입력해주세요.')
       return
     }
-
     setSubmitting(true)
-
     try {
-      // 1. 주문 생성
       const orderResponse = await api.post('/orders', {
         recipientName: formData.recipientName,
         recipientPhone: formData.recipientPhone,
@@ -83,26 +78,17 @@ function Checkout() {
         recipientAddressDetail: formData.recipientAddressDetail,
         memo: formData.memo,
       })
-
       const orderId = orderResponse.data.orderId
-
-      // 2. 결제 요청
       const paymentResponse = await api.post('/payments/prepare', { orderId })
-
       if (paymentResponse.data.testMode) {
-        // 테스트 모드: 바로 결제 승인 처리
         const approveResponse = await api.post('/payments/approve', { orderId })
-
         if (approveResponse.data.success) {
           navigate(`/payment/complete?orderId=${orderId}`)
         } else {
           alert(approveResponse.data.error || '결제 승인에 실패했습니다.')
         }
       } else if (paymentResponse.data.paymentUrl) {
-        // 실제 네이버페이 결제 페이지로 리다이렉트
         window.location.href = paymentResponse.data.paymentUrl
-      } else {
-        alert('결제 요청에 실패했습니다.')
       }
     } catch (error) {
       alert(error.response?.data?.error || '주문에 실패했습니다.')
@@ -120,188 +106,120 @@ function Checkout() {
 
   if (loading) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">로딩 중...</p>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888' }}>로딩 중...</p>
       </div>
     )
   }
 
+  const inputStyle = { width: '100%', background: 'transparent', border: '1px solid #333', padding: '12px 16px', fontSize: '14px', color: '#fff' }
+
   return (
-    <div className="pt-20 min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <h1 className="text-2xl font-light tracking-[0.2em] text-center mb-12">CHECKOUT</h1>
+    <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '64px 80px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', textAlign: 'center', marginBottom: '48px' }}>CHECKOUT</h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '48px' }}>
             {/* 배송 정보 */}
-            <div className="lg:col-span-2 space-y-8">
-              <div>
-                <h2 className="text-lg font-light tracking-wider mb-6">배송 정보</h2>
+            <div>
+              <h2 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '24px' }}>배송 정보</h2>
 
-                <label className="flex items-center gap-2 mb-6 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="sameAsUser"
-                    checked={formData.sameAsUser}
-                    onChange={handleChange}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm text-gray-400">회원 정보와 동일</span>
-                </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', cursor: 'pointer' }}>
+                <input type="checkbox" name="sameAsUser" checked={formData.sameAsUser} onChange={handleChange} />
+                <span style={{ fontSize: '14px', color: '#888' }}>회원 정보와 동일</span>
+              </label>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                      받는 분 *
-                    </label>
-                    <input
-                      type="text"
-                      name="recipientName"
-                      value={formData.recipientName}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                      연락처 *
-                    </label>
-                    <input
-                      type="tel"
-                      name="recipientPhone"
-                      value={formData.recipientPhone}
-                      onChange={handleChange}
-                      required
-                      placeholder="010-0000-0000"
-                      className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                      우편번호
-                    </label>
-                    <input
-                      type="text"
-                      name="recipientZipcode"
-                      value={formData.recipientZipcode}
-                      onChange={handleChange}
-                      className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                      주소 *
-                    </label>
-                    <input
-                      type="text"
-                      name="recipientAddress"
-                      value={formData.recipientAddress}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                      상세주소
-                    </label>
-                    <input
-                      type="text"
-                      name="recipientAddressDetail"
-                      value={formData.recipientAddressDetail}
-                      onChange={handleChange}
-                      className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs tracking-wider text-gray-400 mb-2">
-                      배송 메모
-                    </label>
-                    <input
-                      type="text"
-                      name="memo"
-                      value={formData.memo}
-                      onChange={handleChange}
-                      placeholder="배송 시 요청사항"
-                      className="w-full bg-transparent border border-gray-800 px-4 py-3 text-sm focus:border-gray-600 focus:outline-none"
-                    />
-                  </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>받는 분 *</label>
+                  <input type="text" name="recipientName" value={formData.recipientName} onChange={handleChange} required style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>연락처 *</label>
+                  <input type="tel" name="recipientPhone" value={formData.recipientPhone} onChange={handleChange} required placeholder="010-0000-0000" style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>우편번호</label>
+                  <input type="text" name="recipientZipcode" value={formData.recipientZipcode} onChange={handleChange} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>주소 *</label>
+                  <input type="text" name="recipientAddress" value={formData.recipientAddress} onChange={handleChange} required style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>상세주소</label>
+                  <input type="text" name="recipientAddressDetail" value={formData.recipientAddressDetail} onChange={handleChange} style={inputStyle} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px' }}>배송 메모</label>
+                  <input type="text" name="memo" value={formData.memo} onChange={handleChange} placeholder="배송 시 요청사항" style={inputStyle} />
                 </div>
               </div>
 
               {/* 결제 수단 */}
-              <div>
-                <h2 className="text-lg font-light tracking-wider mb-6">결제 수단</h2>
-                <div className="p-4 border border-gray-800 bg-gray-900/50 flex items-center gap-4">
-                  <div className="w-5 h-5 border-2 border-white rounded-full flex items-center justify-center">
-                    <div className="w-2.5 h-2.5 bg-white rounded-full" />
+              <div style={{ marginTop: '48px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '24px' }}>결제 수단</h2>
+                <div style={{ padding: '16px', border: '1px solid #333', background: '#0a0a0a', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ width: '20px', height: '20px', border: '2px solid #fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '10px', height: '10px', background: '#fff', borderRadius: '50%' }} />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-[#03C75A] px-3 py-1.5 rounded">
-                      <span className="text-white text-sm font-bold">N Pay</span>
-                    </div>
-                    <span className="text-sm text-gray-300">네이버페이</span>
+                  <div style={{ background: '#03C75A', padding: '6px 12px', borderRadius: '4px' }}>
+                    <span style={{ color: '#fff', fontSize: '14px', fontWeight: 'bold' }}>N Pay</span>
                   </div>
+                  <span style={{ fontSize: '14px', color: '#ccc' }}>네이버페이</span>
                 </div>
-                <p className="text-xs text-gray-600 mt-2">
-                  네이버페이로 간편하게 결제하세요.
-                </p>
               </div>
             </div>
 
             {/* 주문 요약 */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 p-6 border border-gray-800 bg-[#0a0a0a]">
-                <h2 className="text-lg font-light tracking-wider mb-6">주문 요약</h2>
+            <div>
+              <div style={{ position: 'sticky', top: '100px', padding: '24px', border: '1px solid #333', background: '#0a0a0a' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '24px' }}>주문 요약</h2>
 
-                {/* 상품 목록 */}
-                <div className="space-y-4 mb-6 pb-6 border-b border-gray-800">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #333' }}>
                   {items.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="w-12 h-12 bg-[#1a1a1a] overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.thumbnail || '/images/placeholder.jpg'}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+                    <div key={item.id} style={{ display: 'flex', gap: '12px' }}>
+                      <div style={{ width: '48px', height: '48px', background: '#1a1a1a', overflow: 'hidden' }}>
+                        <img src={item.thumbnail || '/images/placeholder.jpg'} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs truncate">{item.name}</p>
-                        <p className="text-xs text-gray-500">
-                          ₩ {formatPrice(item.sale_price || item.price)} x {item.quantity}
-                        </p>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: '12px', marginBottom: '4px' }}>{item.name}</p>
+                        <p style={{ fontSize: '12px', color: '#888' }}>₩ {formatPrice(item.sale_price || item.price)} x {item.quantity}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* 금액 */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">상품 금액</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span style={{ color: '#888' }}>상품 금액</span>
                     <span>₩ {formatPrice(totalAmount)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">배송비</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span style={{ color: '#888' }}>배송비</span>
                     <span>{shippingFee === 0 ? '무료' : `₩ ${formatPrice(shippingFee)}`}</span>
                   </div>
-                  <div className="flex justify-between text-lg pt-3 border-t border-gray-800">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', paddingTop: '12px', borderTop: '1px solid #333' }}>
                     <span>총 결제 금액</span>
                     <span>₩ {formatPrice(finalAmount)}</span>
                   </div>
                 </div>
 
-                {/* 결제 버튼 */}
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-4 bg-white text-black text-sm tracking-[0.2em] hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    background: '#fff',
+                    color: '#000',
+                    fontSize: '14px',
+                    letterSpacing: '0.2em',
+                    border: 'none',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    opacity: submitting ? 0.5 : 1,
+                  }}
                 >
                   {submitting ? '처리 중...' : `₩ ${formatPrice(finalAmount)} 결제하기`}
                 </button>

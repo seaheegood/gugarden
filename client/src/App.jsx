@@ -13,6 +13,11 @@ import Checkout from './pages/Checkout'
 import OrderComplete from './pages/OrderComplete'
 import OrderDetail from './pages/OrderDetail'
 import PaymentComplete from './pages/PaymentComplete'
+import AdminLayout from './components/AdminLayout'
+import AdminDashboard from './pages/admin/Dashboard'
+import AdminProducts from './pages/admin/Products'
+import AdminOrders from './pages/admin/Orders'
+import AdminUsers from './pages/admin/Users'
 
 // 인증 필요 라우트
 function PrivateRoute({ children }) {
@@ -111,6 +116,14 @@ function AppRoutes() {
             </PrivateRoute>
           }
         />
+      </Route>
+
+      {/* 관리자 라우트 */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="users" element={<AdminUsers />} />
       </Route>
     </Routes>
   )

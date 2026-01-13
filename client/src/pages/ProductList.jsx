@@ -62,98 +62,73 @@ function ProductList() {
   }
 
   return (
-    <div className="pt-20">
+    <div style={{ paddingTop: '80px', background: '#000', minHeight: '100vh' }}>
       {/* 히어로 섹션 */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(/images/${category}-hero.jpg)`,
-              backgroundColor: '#111',
-            }}
-          />
-          <div className="absolute inset-0 bg-black/60" />
-        </div>
-
-        <div className="relative z-10 text-center px-6">
-          <h1 className="text-3xl md:text-4xl font-extralight tracking-[0.3em] mb-4">
+      <section style={{ height: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.3em', marginBottom: '16px' }}>
             {info.title}
           </h1>
-          <p className="text-gray-400">{info.subtitle}</p>
+          <p style={{ color: '#888', letterSpacing: '0.1em' }}>{info.subtitle}</p>
         </div>
       </section>
 
       {/* 소개 */}
-      <section className="py-16 px-6 border-b border-gray-900">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-gray-500 leading-relaxed">{info.description}</p>
+      <section style={{ padding: '80px 80px', borderBottom: '1px solid #222' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: '#888', lineHeight: 1.8 }}>{info.description}</p>
         </div>
       </section>
 
       {/* 상품 목록 */}
-      <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
+      <section style={{ padding: '80px 80px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           {/* 필터 & 정렬 */}
-          <div className="flex justify-between items-center mb-12">
-            <p className="text-sm text-gray-500">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '48px', paddingBottom: '24px', borderBottom: '1px solid #222' }}>
+            <p style={{ fontSize: '14px', color: '#888' }}>
               {loading ? '로딩 중...' : `${products.length}개의 상품`}
             </p>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent border border-gray-800 px-4 py-2 text-sm focus:outline-none focus:border-gray-600"
+              style={{ background: 'transparent', border: '1px solid #333', padding: '8px 16px', fontSize: '14px', color: '#fff', cursor: 'pointer' }}
             >
-              <option value="newest">최신순</option>
-              <option value="price-low">가격 낮은순</option>
-              <option value="price-high">가격 높은순</option>
+              <option value="newest" style={{ background: '#000' }}>최신순</option>
+              <option value="price-low" style={{ background: '#000' }}>가격 낮은순</option>
+              <option value="price-high" style={{ background: '#000' }}>가격 높은순</option>
             </select>
           </div>
 
-          {/* 로딩 */}
-          {loading && (
-            <div className="text-center py-20">
-              <p className="text-gray-500">상품을 불러오는 중...</p>
-            </div>
-          )}
-
           {/* 상품 그리드 */}
           {!loading && sortedProducts.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
               {sortedProducts.map((product) => (
-                <Link
-                  key={product.id}
-                  to={`/product/${product.id}`}
-                  className="group block"
-                >
-                  <div className="aspect-square bg-[#1a1a1a] relative overflow-hidden mb-4">
-                    <img
-                      src={product.thumbnail || '/images/placeholder.jpg'}
-                      alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(e) => {
-                        e.target.src = '/images/placeholder.jpg'
-                      }}
-                    />
+                <Link key={product.id} to={`/product/${product.id}`} style={{ display: 'block' }}>
+                  <div style={{ aspectRatio: '1/1', background: '#1a1a1a', position: 'relative', marginBottom: '16px', overflow: 'hidden' }}>
+                    {product.thumbnail && (
+                      <img
+                        src={product.thumbnail}
+                        alt={product.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )}
                     {product.sale_price && (
-                      <span className="absolute top-3 left-3 bg-white text-black text-xs px-2 py-1">
+                      <span style={{ position: 'absolute', top: '12px', left: '12px', background: '#fff', color: '#000', fontSize: '10px', padding: '4px 8px', letterSpacing: '0.1em' }}>
                         SALE
                       </span>
                     )}
                   </div>
-                  <h3 className="text-sm font-light tracking-wider mb-2 group-hover:text-gray-400 transition-colors">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center gap-2">
+                  <h3 style={{ fontSize: '14px', marginBottom: '8px' }}>{product.name}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {product.sale_price ? (
                       <>
-                        <span className="text-sm">₩ {formatPrice(product.sale_price)}</span>
-                        <span className="text-xs text-gray-600 line-through">
+                        <span style={{ fontSize: '14px' }}>₩ {formatPrice(product.sale_price)}</span>
+                        <span style={{ fontSize: '12px', color: '#666', textDecoration: 'line-through' }}>
                           ₩ {formatPrice(product.price)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-sm text-gray-500">₩ {formatPrice(product.price)}</span>
+                      <span style={{ fontSize: '14px', color: '#888' }}>₩ {formatPrice(product.price)}</span>
                     )}
                   </div>
                 </Link>
@@ -161,11 +136,24 @@ function ProductList() {
             </div>
           )}
 
+          {/* 로딩 */}
+          {loading && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i}>
+                  <div style={{ aspectRatio: '1/1', background: '#1a1a1a', marginBottom: '16px' }} />
+                  <div style={{ height: '16px', background: '#1a1a1a', width: '75%', marginBottom: '8px' }} />
+                  <div style={{ height: '12px', background: '#1a1a1a', width: '50%' }} />
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* 상품이 없을 때 */}
           {!loading && products.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-gray-500 mb-4">등록된 상품이 없습니다.</p>
-              <Link to="/" className="text-sm text-gray-400 hover:text-white">
+            <div style={{ textAlign: 'center', padding: '100px 0' }}>
+              <p style={{ color: '#888', marginBottom: '24px' }}>등록된 상품이 없습니다.</p>
+              <Link to="/" style={{ border: '1px solid #444', padding: '12px 32px', fontSize: '12px', letterSpacing: '0.2em', color: '#888' }}>
                 홈으로 돌아가기
               </Link>
             </div>

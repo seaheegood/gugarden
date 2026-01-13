@@ -25,7 +25,6 @@ function OrderDetail() {
 
   const handleCancel = async () => {
     if (!confirm('주문을 취소하시겠습니까?')) return
-
     try {
       await api.put(`/orders/${id}/cancel`)
       alert('주문이 취소되었습니다.')
@@ -35,13 +34,8 @@ function OrderDetail() {
     }
   }
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('ko-KR').format(price)
-  }
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('ko-KR')
-  }
+  const formatPrice = (price) => new Intl.NumberFormat('ko-KR').format(price)
+  const formatDate = (dateString) => new Date(dateString).toLocaleString('ko-KR')
 
   const getStatusText = (status) => {
     const statusMap = {
@@ -59,148 +53,97 @@ function OrderDetail() {
 
   if (loading) {
     return (
-      <div className="pt-20 min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">로딩 중...</p>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888' }}>로딩 중...</p>
       </div>
     )
   }
 
   if (!order) {
     return (
-      <div className="pt-20 min-h-screen flex flex-col items-center justify-center">
-        <p className="text-gray-500 mb-4">주문 정보를 찾을 수 없습니다.</p>
-        <Link to="/mypage" className="text-sm text-gray-400 hover:text-white">
-          주문 내역으로 돌아가기
-        </Link>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#888', marginBottom: '16px' }}>주문 정보를 찾을 수 없습니다.</p>
+        <Link to="/mypage" style={{ fontSize: '14px', color: '#888' }}>주문 내역으로 돌아가기</Link>
       </div>
     )
   }
 
   return (
-    <div className="pt-20 min-h-screen">
-      <div className="max-w-3xl mx-auto px-6 py-16">
+    <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '64px 80px' }}>
         {/* 헤더 */}
-        <div className="flex items-center justify-between mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-sm text-gray-500 hover:text-white transition-colors"
-          >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <button onClick={() => navigate(-1)} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '14px', cursor: 'pointer' }}>
             ← 뒤로가기
           </button>
-          <span
-            className={`text-xs px-3 py-1 ${
-              order.status === 'cancelled' ? 'bg-red-900/50 text-red-400' : 'bg-gray-800'
-            }`}
-          >
+          <span style={{
+            fontSize: '12px',
+            padding: '4px 12px',
+            background: order.status === 'cancelled' ? 'rgba(255,0,0,0.2)' : '#222',
+            color: order.status === 'cancelled' ? '#ff6666' : '#fff',
+          }}>
             {getStatusText(order.status)}
           </span>
         </div>
 
-        <h1 className="text-2xl font-light tracking-[0.2em] mb-2">주문 상세</h1>
-        <p className="text-sm text-gray-500 mb-8">
-          주문번호: {order.order_number}
-        </p>
+        <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', marginBottom: '8px' }}>주문 상세</h1>
+        <p style={{ fontSize: '14px', color: '#888', marginBottom: '32px' }}>주문번호: {order.order_number}</p>
 
         {/* 주문 상품 */}
-        <div className="border border-gray-800 mb-6">
-          <div className="p-4 border-b border-gray-800 bg-gray-900/50">
-            <h2 className="text-sm tracking-wider">주문 상품</h2>
+        <div style={{ border: '1px solid #333', marginBottom: '24px' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid #333', background: '#111' }}>
+            <h2 style={{ fontSize: '14px', letterSpacing: '0.1em' }}>주문 상품</h2>
           </div>
-          <div className="divide-y divide-gray-800">
+          <div>
             {order.items?.map((item) => (
-              <div key={item.id} className="flex gap-4 p-4">
-                <div className="w-16 h-16 bg-[#1a1a1a] overflow-hidden flex-shrink-0">
-                  <img
-                    src={item.thumbnail || '/images/placeholder.jpg'}
-                    alt={item.product_name}
-                    className="w-full h-full object-cover"
-                  />
+              <div key={item.id} style={{ display: 'flex', gap: '16px', padding: '16px', borderBottom: '1px solid #222' }}>
+                <div style={{ width: '64px', height: '64px', background: '#1a1a1a', overflow: 'hidden' }}>
+                  <img src={item.thumbnail || '/images/placeholder.jpg'} alt={item.product_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm mb-1">{item.product_name}</p>
-                  <p className="text-xs text-gray-500">
-                    ₩ {formatPrice(item.product_price)} x {item.quantity}
-                  </p>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '14px', marginBottom: '4px' }}>{item.product_name}</p>
+                  <p style={{ fontSize: '12px', color: '#888' }}>₩ {formatPrice(item.product_price)} x {item.quantity}</p>
                 </div>
-                <div className="text-sm">
-                  ₩ {formatPrice(item.product_price * item.quantity)}
-                </div>
+                <div style={{ fontSize: '14px' }}>₩ {formatPrice(item.product_price * item.quantity)}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* 배송 정보 */}
-        <div className="border border-gray-800 mb-6">
-          <div className="p-4 border-b border-gray-800 bg-gray-900/50">
-            <h2 className="text-sm tracking-wider">배송 정보</h2>
+        <div style={{ border: '1px solid #333', marginBottom: '24px' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid #333', background: '#111' }}>
+            <h2 style={{ fontSize: '14px', letterSpacing: '0.1em' }}>배송 정보</h2>
           </div>
-          <div className="p-4 space-y-2 text-sm">
-            <div className="flex">
-              <span className="w-20 text-gray-500">받는 분</span>
-              <span>{order.recipient_name}</span>
-            </div>
-            <div className="flex">
-              <span className="w-20 text-gray-500">연락처</span>
-              <span>{order.recipient_phone}</span>
-            </div>
-            <div className="flex">
-              <span className="w-20 text-gray-500">주소</span>
-              <span>
-                {order.recipient_address}
-                {order.recipient_address_detail && ` ${order.recipient_address_detail}`}
-              </span>
-            </div>
-            {order.memo && (
-              <div className="flex">
-                <span className="w-20 text-gray-500">메모</span>
-                <span>{order.memo}</span>
-              </div>
-            )}
+          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
+            <div style={{ display: 'flex' }}><span style={{ width: '80px', color: '#888' }}>받는 분</span><span>{order.recipient_name}</span></div>
+            <div style={{ display: 'flex' }}><span style={{ width: '80px', color: '#888' }}>연락처</span><span>{order.recipient_phone}</span></div>
+            <div style={{ display: 'flex' }}><span style={{ width: '80px', color: '#888' }}>주소</span><span>{order.recipient_address}{order.recipient_address_detail && ` ${order.recipient_address_detail}`}</span></div>
+            {order.memo && <div style={{ display: 'flex' }}><span style={{ width: '80px', color: '#888' }}>메모</span><span>{order.memo}</span></div>}
           </div>
         </div>
 
         {/* 결제 정보 */}
-        <div className="border border-gray-800 mb-8">
-          <div className="p-4 border-b border-gray-800 bg-gray-900/50">
-            <h2 className="text-sm tracking-wider">결제 정보</h2>
+        <div style={{ border: '1px solid #333', marginBottom: '32px' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid #333', background: '#111' }}>
+            <h2 style={{ fontSize: '14px', letterSpacing: '0.1em' }}>결제 정보</h2>
           </div>
-          <div className="p-4 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">상품 금액</span>
-              <span>₩ {formatPrice(order.total_amount - order.shipping_fee)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">배송비</span>
-              <span>
-                {order.shipping_fee === 0 ? '무료' : `₩ ${formatPrice(order.shipping_fee)}`}
-              </span>
-            </div>
-            <div className="flex justify-between pt-4 border-t border-gray-800 text-base">
-              <span>총 결제 금액</span>
-              <span>₩ {formatPrice(order.total_amount)}</span>
-            </div>
-            <div className="flex justify-between pt-2 text-gray-500 text-xs">
-              <span>주문일시</span>
-              <span>{formatDate(order.created_at)}</span>
-            </div>
+          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#888' }}>상품 금액</span><span>₩ {formatPrice(order.total_amount - order.shipping_fee)}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#888' }}>배송비</span><span>{order.shipping_fee === 0 ? '무료' : `₩ ${formatPrice(order.shipping_fee)}`}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', paddingTop: '16px', borderTop: '1px solid #333' }}><span>총 결제 금액</span><span>₩ {formatPrice(order.total_amount)}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', fontSize: '12px', color: '#888' }}><span>주문일시</span><span>{formatDate(order.created_at)}</span></div>
           </div>
         </div>
 
         {/* 버튼 */}
-        <div className="flex gap-4">
+        <div style={{ display: 'flex', gap: '16px' }}>
           {canCancel && (
-            <button
-              onClick={handleCancel}
-              className="flex-1 py-4 border border-gray-700 text-sm tracking-[0.2em] text-gray-400 hover:border-white hover:text-white transition-colors"
-            >
+            <button onClick={handleCancel} style={{ flex: 1, padding: '16px', border: '1px solid #444', background: 'transparent', color: '#888', fontSize: '14px', letterSpacing: '0.2em', cursor: 'pointer' }}>
               주문 취소
             </button>
           )}
-          <Link
-            to="/mypage"
-            className="flex-1 py-4 bg-white text-black text-center text-sm tracking-[0.2em] hover:bg-gray-200 transition-colors"
-          >
+          <Link to="/mypage" style={{ flex: 1, padding: '16px', background: '#fff', color: '#000', textAlign: 'center', fontSize: '14px', letterSpacing: '0.2em' }}>
             주문 내역으로
           </Link>
         </div>
