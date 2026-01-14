@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import ScrollToTop from './components/ScrollToTop'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import ProductList from './pages/ProductList'
 import ProductDetail from './pages/ProductDetail'
 import Rental from './pages/Rental'
+import Ando from './pages/Ando'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import MyPage from './pages/MyPage'
@@ -51,7 +53,9 @@ function PublicRoute({ children }) {
 
 function AppRoutes() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="terrarium" element={<ProductList />} />
@@ -59,6 +63,7 @@ function AppRoutes() {
         <Route path="kit" element={<ProductList />} />
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="rental" element={<Rental />} />
+        <Route path="ando" element={<Ando />} />
         <Route path="cart" element={<Cart />} />
         <Route
           path="login"
@@ -126,6 +131,7 @@ function AppRoutes() {
         <Route path="users" element={<AdminUsers />} />
       </Route>
     </Routes>
+    </>
   )
 }
 

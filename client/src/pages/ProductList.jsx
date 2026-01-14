@@ -7,16 +7,19 @@ const categoryInfo = {
     title: 'TERRARIUM',
     subtitle: '밀폐된 유리 안의 작은 생태계',
     description: '테라리움은 밀폐된 유리 용기 안에서 자체적인 생태계를 형성하는 작은 정원입니다. 최소한의 관리로 자연의 아름다움을 오래도록 즐길 수 있습니다.',
+    image: '/images/terrarium_main.jpeg',
   },
   vivarium: {
     title: 'VIVARIUM',
     subtitle: '살아있는 자연을 담은 공간',
     description: '비바리움은 식물과 동물이 함께 어우러진 살아있는 생태 공간입니다. 열대 우림부터 사막까지, 다양한 자연 환경을 재현합니다.',
+    image: '/images/vivarium_main.jpeg',
   },
   kit: {
     title: 'KIT',
     subtitle: '직접 만드는 나만의 정원',
     description: '필요한 모든 재료가 포함된 DIY 키트로, 나만의 테라리움을 직접 만들어보세요. 상세한 설명서가 함께 제공됩니다.',
+    image: '/images/kit_main.jpeg',
   },
 }
 
@@ -64,12 +67,31 @@ function ProductList() {
   return (
     <div style={{ background: '#000', minHeight: '100vh' }}>
       {/* 히어로 섹션 */}
-      <section style={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.3em', marginBottom: '16px' }}>
+      <section style={{
+        height: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundImage: `url(${info.image})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+      }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.4)',
+          }}
+        />
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.3em', marginBottom: '16px', color: '#fff' }}>
             {info.title}
           </h1>
-          <p style={{ color: '#888', letterSpacing: '0.1em' }}>{info.subtitle}</p>
+          <p style={{ color: '#ccc', letterSpacing: '0.1em' }}>{info.subtitle}</p>
         </div>
       </section>
 

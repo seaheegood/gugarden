@@ -45,11 +45,30 @@ function Rental() {
   return (
     <div>
       {/* 히어로 섹션 */}
-      <section style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '24px' }}>FOR BUSINESS</p>
-          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px' }}>RENTAL SERVICE</h1>
-          <p style={{ color: '#888' }}>공간에 자연을 더하는 테라리움 렌탈 서비스</p>
+      <section style={{
+        height: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundImage: 'url(/images/rental_main.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+      }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.4)',
+          }}
+        />
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#ccc', marginBottom: '24px' }}>FOR BUSINESS</p>
+          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px', color: '#fff' }}>RENTAL SERVICE</h1>
+          <p style={{ color: '#ccc' }}>공간에 자연을 더하는 테라리움 렌탈 서비스</p>
         </div>
       </section>
 

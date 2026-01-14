@@ -9,7 +9,7 @@ function Header() {
   const { isAuthenticated, user } = useAuth();
 
   // 히어로 섹션이 있는 페이지들 (투명 헤더 적용)
-  const heroPages = ['/', '/terrarium', '/vivarium', '/kit', '/rental'];
+  const heroPages = ['/', '/terrarium', '/vivarium', '/kit', '/rental', '/ando'];
   const hasHero = heroPages.includes(location.pathname);
 
   useEffect(() => {
@@ -29,6 +29,7 @@ function Header() {
     { to: "/vivarium", label: "VIVARIUM" },
     { to: "/kit", label: "KIT" },
     { to: "/rental", label: "RENTAL" },
+    { to: "/ando", label: "ANDO" },
   ];
 
   return (
