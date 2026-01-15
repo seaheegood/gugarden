@@ -327,13 +327,26 @@ router.put('/products/:id', upload.single('thumbnail'), async (req, res) => {
       isFeatured
     } = req.body
 
-    const [existing] = await pool.query('SELECT id FROM products WHERE id = ?', [id])
+    console.log('상품 수정 요청:', { id, hasFile: !!req.file, thumbnail })
+
+    const [existing] = await pool.query('SELECT thumbnail FROM products WHERE id = ?', [id])
     if (existing.length === 0) {
       return res.status(404).json({ error: '상품을 찾을 수 없습니다.' })
     }
 
-    // 파일 업로드가 있으면 파일 경로 사용, 없으면 기존 URL 유지
-    const thumbnailPath = req.file ? `/uploads/${req.file.filename}` : thumbnail
+    // 파일 업로드가 있으면 파일 경로 사용
+    // 없으면 요청에 URL이 있으면 사용, 둘 다 없으면 기존 값 유지
+    let thumbnailPath
+    if (req.file) {
+      thumbnailPath = `/uploads/${req.file.filename}`
+      console.log('새 파일 업로드:', thumbnailPath)
+    } else if (thumbnail) {
+      thumbnailPath = thumbnail
+      console.log('URL 사용:', thumbnailPath)
+    } else {
+      thumbnailPath = existing[0].thumbnail // 기존 값 유지
+      console.log('기존 값 유지:', thumbnailPath)
+    }
 
     await pool.query(`
       UPDATE products SET
@@ -352,6 +365,7 @@ router.put('/products/:id', upload.single('thumbnail'), async (req, res) => {
       stock, thumbnailPath, isActive, isFeatured, id
     ])
 
+    console.log('상품 수정 완료:', { id, thumbnail: thumbnailPath })
     res.json({ message: '상품이 수정되었습니다.', thumbnail: thumbnailPath })
   } catch (error) {
     console.error('상품 수정 에러:', error)
@@ -599,6 +613,129 @@ router.get('/categories', async (req, res) => {
   } catch (error) {
     console.error('카테고리 조회 에러:', error)
     res.status(500).json({ error: '카테고리를 불러오는데 실패했습니다.' })
+  }
+})
+
+// =====================
+// 렌탈 문의 관리
+// =====================
+
+// 렌탈 문의 목록
+router.get('/rental-inquiries', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 20
+    const offset = (page - 1) * limit
+    const status = req.query.status || ''
+
+    let whereClause = ''
+    let params = []
+
+    if (status) {
+      whereClause = 'WHERE status = ?'
+      params.push(status)
+    }
+
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) as total FROM rental_inquiries ${whereClause}`,
+      params
+    )
+
+    const [inquiries] = await pool.query(`
+      SELECT * FROM rental_inquiries
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
+    `, [...params, limit, offset])
+
+    res.json({
+      inquiries,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    })
+  } catch (error) {
+    console.error('렌탈 문의 목록 조회 에러:', error)
+    res.status(500).json({ error: '렌탈 문의 목록을 불러오는데 실패했습니다.' })
+  }
+})
+
+// 렌탈 문의 상세
+router.get('/rental-inquiries/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const [inquiries] = await pool.query(
+      'SELECT * FROM rental_inquiries WHERE id = ?',
+      [id]
+    )
+
+    if (inquiries.length === 0) {
+      return res.status(404).json({ error: '문의를 찾을 수 없습니다.' })
+    }
+
+    res.json({ inquiry: inquiries[0] })
+  } catch (error) {
+    console.error('렌탈 문의 상세 조회 에러:', error)
+    res.status(500).json({ error: '렌탈 문의 정보를 불러오는데 실패했습니다.' })
+  }
+})
+
+// 렌탈 문의 상태 변경
+router.put('/rental-inquiries/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { status } = req.body
+
+    const validStatuses = ['pending', 'contacted', 'completed', 'cancelled']
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: '유효하지 않은 상태입니다.' })
+    }
+
+    const [inquiries] = await pool.query(
+      'SELECT id FROM rental_inquiries WHERE id = ?',
+      [id]
+    )
+
+    if (inquiries.length === 0) {
+      return res.status(404).json({ error: '문의를 찾을 수 없습니다.' })
+    }
+
+    await pool.query(
+      'UPDATE rental_inquiries SET status = ? WHERE id = ?',
+      [status, id]
+    )
+
+    res.json({ message: '문의 상태가 변경되었습니다.', status })
+  } catch (error) {
+    console.error('렌탈 문의 상태 변경 에러:', error)
+    res.status(500).json({ error: '렌탈 문의 상태 변경에 실패했습니다.' })
+  }
+})
+
+// 렌탈 문의 삭제
+router.delete('/rental-inquiries/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const [inquiries] = await pool.query(
+      'SELECT id FROM rental_inquiries WHERE id = ?',
+      [id]
+    )
+
+    if (inquiries.length === 0) {
+      return res.status(404).json({ error: '문의를 찾을 수 없습니다.' })
+    }
+
+    await pool.query('DELETE FROM rental_inquiries WHERE id = ?', [id])
+
+    res.json({ message: '렌탈 문의가 삭제되었습니다.' })
+  } catch (error) {
+    console.error('렌탈 문의 삭제 에러:', error)
+    res.status(500).json({ error: '렌탈 문의 삭제에 실패했습니다.' })
   }
 })
 

@@ -20,6 +20,7 @@ app.use('/api/auth', require('./routes/auth'))
 app.use('/api/cart', require('./routes/cart'))
 app.use('/api/orders', require('./routes/orders'))
 app.use('/api/payments', require('./routes/payments'))
+app.use('/api/rental', require('./routes/rental'))
 app.use('/api/admin', require('./routes/admin'))
 
 // 헬스 체크

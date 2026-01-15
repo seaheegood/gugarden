@@ -20,6 +20,7 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AdminProducts from './pages/admin/Products'
 import AdminOrders from './pages/admin/Orders'
 import AdminUsers from './pages/admin/Users'
+import AdminRentalInquiries from './pages/admin/RentalInquiries'
 
 // 인증 필요 라우트
 function PrivateRoute({ children }) {
@@ -128,6 +129,7 @@ function AppRoutes() {
         <Route index element={<AdminDashboard />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="orders" element={<AdminOrders />} />
+        <Route path="rental-inquiries" element={<AdminRentalInquiries />} />
         <Route path="users" element={<AdminUsers />} />
       </Route>
     </Routes>

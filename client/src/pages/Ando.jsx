@@ -212,17 +212,10 @@ function Ando() {
                   1층 101호
                 </p>
               </div>
-              <div style={{ marginBottom: '24px' }}>
-                <p style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>교통</p>
-                <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
-                  상세한 교통 안내는 예약 시 안내드립니다
-                </p>
-              </div>
               <div>
                 <p style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>주차</p>
                 <p style={{ fontSize: '14px', color: '#888', lineHeight: 1.6 }}>
-                  인근 공영주차장 이용 가능<br />
-                  (주차 정보는 예약 시 안내)
+                  작업실 앞 1대 가능
                 </p>
               </div>
             </div>

@@ -197,8 +197,7 @@ function Products() {
 
       const response = await api.post(
         `/admin/products/${editingProduct.id}/images`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        formData
       )
 
       setProductImages(response.data.images || [])
@@ -251,13 +250,11 @@ function Products() {
         submitData.append('thumbnail', formData.thumbnail)
       }
 
-      const config = { headers: { 'Content-Type': 'multipart/form-data' } }
-
       if (editingProduct) {
-        await api.put(`/admin/products/${editingProduct.id}`, submitData, config)
+        await api.put(`/admin/products/${editingProduct.id}`, submitData)
         alert('상품이 수정되었습니다.')
       } else {
-        await api.post('/admin/products', submitData, config)
+        await api.post('/admin/products', submitData)
         alert('상품이 등록되었습니다.')
       }
 

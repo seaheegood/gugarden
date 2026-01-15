@@ -307,7 +307,14 @@ function Home() {
             alignItems: "center",
           }}
         >
-          <div style={{ aspectRatio: "4/3", background: "#1a1a1a" }} />
+          <div
+            style={{
+              aspectRatio: "4/3",
+              backgroundImage: "url(/images/rental_main.jpeg)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
           <div>
             <p
               style={{

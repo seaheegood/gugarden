@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import api from '../api'
 
 function Rental() {
   const [formData, setFormData] = useState({
@@ -21,9 +22,16 @@ function Rental() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setSubmitted(true)
-    setIsSubmitting(false)
+
+    try {
+      await api.post('/rental/inquiry', formData)
+      setSubmitted(true)
+    } catch (error) {
+      console.error('렌탈 문의 제출 에러:', error)
+      alert(error.response?.data?.error || '문의 제출에 실패했습니다.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const services = [
