@@ -3,14 +3,12 @@ import { Link } from "react-router-dom";
 function Footer() {
   return (
     <footer style={{ background: "#0a0a0a", borderTop: "1px solid #222" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 80px" }}>
+      <div className="responsive-container">
         {/* 메인 푸터 */}
         <div
+          className="footer-grid"
           style={{
             padding: "48px 0",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "48px",
           }}
         >
           {/* 브랜드 */}
@@ -172,12 +170,10 @@ function Footer() {
 
         {/* 하단 */}
         <div
+          className="footer-bottom"
           style={{
             padding: "20px 0",
             borderTop: "1px solid #222",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
           }}
         >
           <p style={{ fontSize: "12px", color: "#555" }}>
@@ -224,9 +220,9 @@ function Footer() {
 
       {/* 이미지 섹션 */}
       <div
+        className="footer-image"
         style={{
           width: "100%",
-          height: "450px",
           backgroundImage: "url(/images/footer.jpeg)",
           backgroundSize: "cover",
           backgroundPosition: "center",

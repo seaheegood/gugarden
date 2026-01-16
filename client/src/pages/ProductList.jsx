@@ -67,7 +67,7 @@ function ProductList() {
   return (
     <div style={{ background: '#000', minHeight: '100vh' }}>
       {/* 히어로 섹션 */}
-      <section style={{
+      <section className="hero-section" style={{
         height: '80vh',
         display: 'flex',
         alignItems: 'center',
@@ -87,8 +87,8 @@ function ProductList() {
             background: 'rgba(0, 0, 0, 0.4)',
           }}
         />
-        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.3em', marginBottom: '16px', color: '#fff' }}>
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 20px' }}>
+          <h1 className="hero-title" style={{ fontWeight: 200, letterSpacing: '0.3em', marginBottom: '16px', color: '#fff' }}>
             {info.title}
           </h1>
           <p style={{ color: '#ccc', letterSpacing: '0.1em' }}>{info.subtitle}</p>
@@ -96,15 +96,15 @@ function ProductList() {
       </section>
 
       {/* 소개 */}
-      <section style={{ padding: '80px 80px', borderBottom: '1px solid #222' }}>
+      <section className="responsive-section" style={{ borderBottom: '1px solid #222' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
           <p style={{ color: '#888', lineHeight: 1.8 }}>{info.description}</p>
         </div>
       </section>
 
       {/* 상품 목록 */}
-      <section style={{ padding: '80px 80px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="responsive-section">
+        <div className="responsive-container">
           {/* 필터 & 정렬 */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '48px', paddingBottom: '24px', borderBottom: '1px solid #222' }}>
             <p style={{ fontSize: '14px', color: '#888' }}>
@@ -135,7 +135,7 @@ function ProductList() {
 
           {/* 상품 그리드 */}
           {!loading && sortedProducts.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+            <div className="grid-4">
               {sortedProducts.map((product) => (
                 <Link key={product.id} to={`/product/${product.id}`} style={{ display: 'block' }}>
                   <div style={{ aspectRatio: '1/1', background: '#1a1a1a', position: 'relative', marginBottom: '16px', overflow: 'hidden' }}>
@@ -172,7 +172,7 @@ function ProductList() {
 
           {/* 로딩 */}
           {loading && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+            <div className="grid-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i}>
                   <div style={{ aspectRatio: '1/1', background: '#1a1a1a', marginBottom: '16px' }} />

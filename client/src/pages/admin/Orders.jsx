@@ -104,7 +104,7 @@ function Orders() {
       </div>
 
       {/* 필터 */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-4 lg:mb-6">
         {statusList.map((status) => (
           <button
             key={status.value}
@@ -112,7 +112,7 @@ function Orders() {
               setStatusFilter(status.value)
               setPagination((prev) => ({ ...prev, page: 1 }))
             }}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+            className={`px-2.5 lg:px-3 py-1.5 text-xs lg:text-sm font-medium rounded-md transition-colors ${
               statusFilter === status.value
                 ? 'bg-gray-900 text-white'
                 : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
@@ -131,7 +131,9 @@ function Orders() {
             <p className="text-gray-600 text-sm">로딩 중...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* 데스크톱 테이블 */}
+          <div className="overflow-x-auto hidden lg:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 text-left bg-gray-50">
@@ -200,6 +202,53 @@ function Orders() {
               </tbody>
             </table>
           </div>
+
+          {/* 모바일 카드 */}
+          <div className="lg:hidden divide-y divide-gray-100">
+            {orders.length > 0 ? (
+              orders.map((order) => (
+                <div key={order.id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <button
+                    onClick={() => openOrderDetail(order.id)}
+                    className="w-full text-left mb-3"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 mb-1">{order.order_number}</p>
+                        <p className="text-xs font-medium text-gray-800">{order.user_name}</p>
+                        <p className="text-xs text-gray-500">{order.user_email}</p>
+                      </div>
+                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ml-2 flex-shrink-0 ${getStatusStyle(order.status)}`}>
+                        {getStatusText(order.status)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-gray-600">{order.item_count}개 상품</span>
+                      <span className="font-semibold text-gray-800">₩{formatPrice(order.total_amount)}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">{formatDate(order.created_at)}</p>
+                  </button>
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateStatus(order.id, e.target.value)}
+                    className="w-full bg-white border border-gray-300 text-sm font-medium text-gray-700 px-3 py-2 pr-8 rounded-md focus:outline-none focus:border-gray-500 appearance-none cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.25em 1.25em' }}
+                  >
+                    {statusList.slice(1).map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-12 text-center text-gray-500 text-sm">
+                주문이 없습니다.
+              </div>
+            )}
+          </div>
+          </>
         )}
 
         {/* 페이지네이션 */}
@@ -224,16 +273,16 @@ function Orders() {
 
       {/* 주문 상세 모달 */}
       {showModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-gray-50">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">주문 상세</h2>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 lg:p-4 p-0">
+          <div className="bg-white rounded-2xl lg:rounded-2xl rounded-none w-full max-w-2xl max-h-[90vh] lg:max-h-[90vh] h-full lg:h-auto overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 lg:px-8 py-4 lg:py-6 border-b border-gray-200 bg-gray-50">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base lg:text-lg font-semibold text-gray-800">주문 상세</h2>
                 <p className="text-xs text-gray-500 mt-1">{selectedOrder.order_number}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-gray-700 transition-colors p-1"
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1 flex-shrink-0"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -241,7 +290,7 @@ function Orders() {
               </button>
             </div>
 
-            <div className="p-8 space-y-6">
+            <div className="p-4 lg:p-8 space-y-5 lg:space-y-6">
               {/* 주문 상태 */}
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-medium px-4 py-2 rounded-full ${getStatusStyle(selectedOrder.status)}`}>

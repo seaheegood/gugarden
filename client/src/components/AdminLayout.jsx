@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { NavLink, Outlet, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function AdminLayout() {
   const { user, loading, logout } = useAuth()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   if (loading) {
     return (
@@ -50,14 +52,56 @@ function AdminLayout() {
 
   return (
     <div className="admin-layout min-h-screen bg-gray-100 flex">
+      {/* 모바일 헤더 */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-50">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+          <div>
+            <span className="text-sm font-medium text-gray-800">GUGARDEN</span>
+            <span className="block text-[9px] tracking-wider text-gray-500">ADMIN</span>
+          </div>
+        </div>
+      </div>
+
       {/* 사이드바 */}
-      <aside className="w-60 bg-white border-r border-gray-200 flex flex-col shadow-sm">
+      <aside className={`
+        w-60 bg-white border-r border-gray-200 flex flex-col shadow-sm
+        lg:static lg:translate-x-0
+        fixed top-0 left-0 bottom-0 z-40 transition-transform duration-300
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
         {/* 로고 */}
-        <div className="px-5 py-4 border-b border-gray-200">
+        <div className="px-5 py-4 border-b border-gray-200 lg:block hidden">
           <NavLink to="/admin" className="block">
             <span className="text-lg tracking-[0.2em] font-medium text-gray-800">GUGARDEN</span>
             <span className="block text-[10px] tracking-[0.3em] text-gray-500 mt-1">ADMIN</span>
           </NavLink>
+        </div>
+
+        {/* 모바일용 헤더 */}
+        <div className="px-5 py-4 border-b border-gray-200 lg:hidden flex items-center justify-between">
+          <NavLink to="/admin" className="block">
+            <span className="text-base font-medium text-gray-800">GUGARDEN ADMIN</span>
+          </NavLink>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="p-1 text-gray-500 hover:text-gray-700"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         {/* 메뉴 */}
@@ -68,6 +112,7 @@ function AdminLayout() {
                 <NavLink
                   to={item.path}
                   end={item.end}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-all ${
                       isActive
@@ -114,8 +159,16 @@ function AdminLayout() {
         </div>
       </aside>
 
+      {/* 모바일 오버레이 */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* 메인 콘텐츠 */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto lg:pt-0 pt-16">
         <Outlet />
       </main>
     </div>

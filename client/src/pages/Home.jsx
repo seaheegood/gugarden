@@ -26,6 +26,7 @@ function Home() {
     <div>
       {/* 히어로 */}
       <section
+        className="hero-section"
         style={{
           height: "100vh",
           display: "flex",
@@ -47,10 +48,10 @@ function Home() {
             background: "rgba(0, 0, 0, 0.4)",
           }}
         />
-        <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
+        <div style={{ textAlign: "center", position: "relative", zIndex: 1, padding: "0 20px" }}>
           <p
+            className="hero-subtitle"
             style={{
-              fontSize: "11px",
               letterSpacing: "0.4em",
               color: "#ccc",
               marginBottom: "24px",
@@ -59,8 +60,8 @@ function Home() {
             Nature in Glass
           </p>
           <h1
+            className="hero-title"
             style={{
-              fontSize: "48px",
               fontWeight: 200,
               letterSpacing: "0.2em",
               marginBottom: "16px",
@@ -88,13 +89,13 @@ function Home() {
       </section>
 
       {/* 소개 */}
-      <section style={{ padding: "100px 80px", background: "#000" }}>
+      <section className="responsive-section" style={{ background: "#000" }}>
         <div
           style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}
         >
           <h2
+            className="section-title"
             style={{
-              fontSize: "24px",
               fontWeight: 200,
               marginBottom: "24px",
               lineHeight: 1.6,
@@ -112,8 +113,8 @@ function Home() {
       </section>
 
       {/* 카테고리 */}
-      <section style={{ padding: "0 80px 100px", background: "#000" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <section style={{ padding: "0 20px 60px", paddingTop: 0, background: "#000" }}>
+        <div className="responsive-container">
           <p
             style={{
               fontSize: "11px",
@@ -125,17 +126,14 @@ function Home() {
             Products
           </p>
           <h2
-            style={{ fontSize: "24px", fontWeight: 200, marginBottom: "48px" }}
+            className="section-title"
+            style={{ fontWeight: 200, marginBottom: "48px" }}
           >
             Our Collection
           </h2>
 
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "32px",
-            }}
+            className="grid-3"
           >
             <Link to="/terrarium" style={{ display: "block" }}>
               <div
@@ -191,8 +189,8 @@ function Home() {
       </section>
 
       {/* 피처드 상품 */}
-      <section style={{ padding: "100px 80px", background: "#0a0a0a" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <section className="responsive-section" style={{ background: "#0a0a0a" }}>
+        <div className="responsive-container">
           <p
             style={{
               fontSize: "11px",
@@ -204,17 +202,14 @@ function Home() {
             Featured
           </p>
           <h2
-            style={{ fontSize: "24px", fontWeight: 200, marginBottom: "48px" }}
+            className="section-title"
+            style={{ fontWeight: 200, marginBottom: "48px" }}
           >
             Selected Products
           </h2>
 
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "32px",
-            }}
+            className="grid-4"
           >
             {featuredProducts.length > 0
               ? featuredProducts.slice(0, 4).map((product) => (
@@ -296,14 +291,10 @@ function Home() {
       </section>
 
       {/* 렌탈 */}
-      <section style={{ padding: "100px 80px", background: "#000" }}>
+      <section className="responsive-section" style={{ background: "#000" }}>
         <div
+          className="responsive-container grid-2"
           style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "64px",
             alignItems: "center",
           }}
         >
@@ -364,20 +355,14 @@ function Home() {
 
       {/* 특징 */}
       <section
+        className="responsive-section"
         style={{
-          padding: "100px 80px",
           background: "#0a0a0a",
           borderTop: "1px solid #222",
         }}
       >
         <div
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "64px",
-          }}
+          className="responsive-container grid-3"
         >
           <div>
             <h3 style={{ fontSize: "14px", marginBottom: "12px" }}>

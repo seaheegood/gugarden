@@ -92,7 +92,7 @@ function ProductDetail() {
   return (
     <div style={{ paddingTop: '80px', background: '#000', minHeight: '100vh' }}>
       {/* 브레드크럼 */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 80px' }}>
+      <div className="responsive-container" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
         <nav style={{ fontSize: '12px', color: '#666', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Link to="/">HOME</Link>
           <span>/</span>
@@ -103,8 +103,8 @@ function ProductDetail() {
       </div>
 
       {/* 상품 정보 */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 80px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' }}>
+      <div className="responsive-container" style={{ paddingTop: '32px', paddingBottom: '32px' }}>
+        <div className="grid-2">
           {/* 이미지 섹션 */}
           <div>
             <div style={{ aspectRatio: '1/1', background: '#1a1a1a', position: 'relative', marginBottom: '16px' }}>

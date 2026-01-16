@@ -69,3 +69,195 @@
     background: #6b7280;
   }
 }
+
+/* 모바일 반응형 스타일 */
+@layer utilities {
+  /* 레이아웃 */
+  .responsive-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 80px;
+  }
+
+  .responsive-section {
+    padding: 100px 80px;
+  }
+
+  /* 그리드 */
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  /* 히어로 타이틀 */
+  .hero-title {
+    font-size: 48px;
+  }
+
+  .hero-subtitle {
+    font-size: 11px;
+  }
+
+  /* 섹션 타이틀 */
+  .section-title {
+    font-size: 24px;
+  }
+
+  .section-title-large {
+    font-size: 28px;
+  }
+
+  /* 모바일 대응 (768px 이하) */
+  @media (max-width: 768px) {
+    .responsive-container {
+      padding: 0 20px;
+    }
+
+    .responsive-section {
+      padding: 60px 20px;
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .grid-3 {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .hero-title {
+      font-size: 32px;
+    }
+
+    .hero-subtitle {
+      font-size: 10px;
+    }
+
+    .section-title {
+      font-size: 20px;
+    }
+
+    .section-title-large {
+      font-size: 24px;
+    }
+
+    /* 히어로 섹션 높이 조정 */
+    .hero-section {
+      height: 60vh !important;
+      min-height: 400px;
+    }
+
+    /* 모바일 전용 숨김 */
+    .hide-mobile {
+      display: none !important;
+    }
+
+    /* 모바일 전용 표시 */
+    .show-mobile {
+      display: block !important;
+    }
+  }
+
+  /* 기본적으로 모바일 전용은 숨김 */
+  .show-mobile {
+    display: none;
+  }
+
+  /* Header 스타일 */
+  @media (max-width: 768px) {
+    .header-logo {
+      height: 36px !important;
+    }
+  }
+
+  /* Footer 스타일 */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 48px;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-image {
+    height: 450px;
+  }
+
+  /* Cart 스타일 */
+  .cart-item {
+    display: flex;
+    gap: 24px;
+  }
+
+  .cart-item-image {
+    width: 96px;
+    height: 96px;
+  }
+
+  @media (max-width: 768px) {
+    .cart-item {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cart-item-image {
+      width: 100%;
+      height: 200px;
+    }
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .footer-image {
+      height: 250px;
+    }
+
+    /* Checkout 스타일 */
+    .checkout-summary {
+      position: static !important;
+    }
+
+    /* MyPage 탭 스타일 */
+    .mypage-tabs {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+
+  /* Checkout 스타일 */
+  .checkout-summary {
+    position: sticky;
+    top: 100px;
+  }
+}

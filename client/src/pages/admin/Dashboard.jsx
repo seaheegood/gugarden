@@ -75,7 +75,7 @@ function Dashboard() {
       </div>
 
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-5 mb-6 lg:mb-8">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="w-11 h-11 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -134,14 +134,14 @@ function Dashboard() {
 
       {/* 최근 주문 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 lg:px-6 py-4 border-b border-gray-200">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">최근 주문</h2>
+            <h2 className="text-base lg:text-lg font-semibold text-gray-800">최근 주문</h2>
             <p className="text-xs text-gray-500 mt-1">최근 5건의 주문 내역</p>
           </div>
           <Link
             to="/admin/orders"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
+            className="text-xs lg:text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1.5 px-2 lg:px-3 py-1.5 bg-gray-100 rounded-md hover:bg-gray-200"
           >
             전체 보기
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,8 @@ function Dashboard() {
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* 데스크톱 테이블 */}
+        <div className="overflow-x-auto hidden lg:block">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 text-left bg-gray-50">
@@ -198,6 +199,37 @@ function Dashboard() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* 모바일 카드 */}
+        <div className="lg:hidden divide-y divide-gray-100">
+          {recentOrders?.length > 0 ? (
+            recentOrders.map((order) => (
+              <Link
+                key={order.id}
+                to={`/admin/orders`}
+                className="block p-4 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 mb-1">{order.order_number}</p>
+                    <p className="text-xs text-gray-600">{order.user_name || order.user_email}</p>
+                  </div>
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ml-2 ${getStatusStyle(order.status)}`}>
+                    {getStatusText(order.status)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-semibold text-gray-800">₩{formatPrice(order.total_amount)}</span>
+                  <span className="text-xs text-gray-500">{formatDate(order.created_at)}</span>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="px-4 py-12 text-center text-gray-500 text-sm">
+              주문 내역이 없습니다.
+            </div>
+          )}
         </div>
       </div>
     </div>

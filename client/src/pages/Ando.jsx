@@ -53,7 +53,7 @@ function Ando() {
   return (
     <div>
       {/* 히어로 섹션 */}
-      <section style={{
+      <section className="hero-section" style={{
         height: '80vh',
         display: 'flex',
         alignItems: 'center',
@@ -73,17 +73,17 @@ function Ando() {
             background: 'rgba(0, 0, 0, 0.4)',
           }}
         />
-        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 20px' }}>
           <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#ccc', marginBottom: '24px' }}>STUDIO</p>
-          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px', color: '#fff' }}>ANDO</h1>
+          <h1 className="hero-title" style={{ fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px', color: '#fff' }}>ANDO</h1>
           <p style={{ color: '#ccc' }}>구의정원 작가의 작업실</p>
         </div>
       </section>
 
       {/* 소개 섹션 */}
-      <section style={{ padding: '100px 80px' }}>
+      <section className="responsive-section">
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 200, marginBottom: '32px', lineHeight: 1.6 }}>
+          <h2 className="section-title-large" style={{ fontWeight: 200, marginBottom: '32px', lineHeight: 1.6 }}>
             자연과 함께하는<br />창작의 공간
           </h2>
           <p style={{ color: '#888', lineHeight: 1.8 }}>
@@ -94,15 +94,15 @@ function Ando() {
       </section>
 
       {/* 클래스 & 작품 메뉴 */}
-      <section style={{ padding: '80px 80px', background: '#0a0a0a' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="responsive-section" style={{ background: '#0a0a0a' }}>
+        <div className="responsive-container">
           {/* 데일리 클래스 */}
           <div style={{ marginBottom: '80px' }}>
             <div style={{ textAlign: 'center', marginBottom: '48px' }}>
               <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>DAILY CLASS</p>
-              <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>데일리 클래스</h2>
+              <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>데일리 클래스</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
+            <div className="grid-2" style={{ maxWidth: '800px', margin: '0 auto' }}>
               {classes.map((item, index) => (
                 <div key={index} style={{ padding: '32px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: 300, letterSpacing: '0.05em' }}>{item.title}</h3>
@@ -116,9 +116,9 @@ function Ando() {
           <div style={{ marginBottom: '80px' }}>
             <div style={{ textAlign: 'center', marginBottom: '48px' }}>
               <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>READY-MADE</p>
-              <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>완성품</h2>
+              <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>완성품</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+            <div className="grid-3">
               {products.map((item, index) => (
                 <div key={index} style={{ padding: '32px', border: '1px solid #333', textAlign: 'center' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: 300, letterSpacing: '0.05em', marginBottom: '16px' }}>{item.title}</h3>
@@ -132,9 +132,9 @@ function Ando() {
           <div style={{ marginBottom: '80px' }}>
             <div style={{ textAlign: 'center', marginBottom: '48px' }}>
               <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>CUSTOM ORDER</p>
-              <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>주문 제작</h2>
+              <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>주문 제작</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
+            <div className="grid-2" style={{ maxWidth: '800px', margin: '0 auto' }}>
               {customOrders.map((item, index) => (
                 <div key={index} style={{ padding: '32px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ fontSize: '16px', fontWeight: 300, letterSpacing: '0.05em' }}>{item.title}</h3>
@@ -148,7 +148,7 @@ function Ando() {
           <div>
             <div style={{ textAlign: 'center', marginBottom: '48px' }}>
               <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>MATERIALS</p>
-              <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>재료</h2>
+              <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>재료</h2>
             </div>
             <div style={{ maxWidth: '400px', margin: '0 auto' }}>
               {materials.map((item, index) => (
@@ -170,13 +170,13 @@ function Ando() {
       </section>
 
       {/* 작업실 사진 */}
-      <section style={{ padding: '100px 80px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="responsive-section">
+        <div className="responsive-container">
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>STUDIO GALLERY</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>작업실 갤러리</h2>
+            <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>작업실 갤러리</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
+          <div className="grid-2">
             {studioImages.map((image) => (
               <div
                 key={image.id}
@@ -197,13 +197,13 @@ function Ando() {
       </section>
 
       {/* 위치 */}
-      <section style={{ padding: '100px 80px', background: '#0a0a0a' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="responsive-section" style={{ background: '#0a0a0a' }}>
+        <div className="responsive-container">
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>LOCATION</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>오시는 길</h2>
+            <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>오시는 길</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'center' }}>
+          <div className="grid-2" style={{ alignItems: 'center' }}>
             <div>
               <div style={{ marginBottom: '24px' }}>
                 <p style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>주소</p>
@@ -244,7 +244,7 @@ function Ando() {
       </section>
 
       {/* 문의 섹션 */}
-      <section style={{ padding: '100px 80px' }}>
+      <section className="responsive-section">
         <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
           <h3 style={{ fontSize: '20px', fontWeight: 300, marginBottom: '24px' }}>방문 예약 및 문의</h3>
           <p style={{ color: '#888', lineHeight: 1.8, marginBottom: '32px' }}>

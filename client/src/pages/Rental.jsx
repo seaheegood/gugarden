@@ -53,7 +53,7 @@ function Rental() {
   return (
     <div>
       {/* 히어로 섹션 */}
-      <section style={{
+      <section className="hero-section" style={{
         height: '80vh',
         display: 'flex',
         alignItems: 'center',
@@ -73,17 +73,17 @@ function Rental() {
             background: 'rgba(0, 0, 0, 0.4)',
           }}
         />
-        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 1, padding: '0 20px' }}>
           <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#ccc', marginBottom: '24px' }}>FOR BUSINESS</p>
-          <h1 style={{ fontSize: '48px', fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px', color: '#fff' }}>RENTAL SERVICE</h1>
+          <h1 className="hero-title" style={{ fontWeight: 200, letterSpacing: '0.2em', marginBottom: '24px', color: '#fff' }}>RENTAL SERVICE</h1>
           <p style={{ color: '#ccc' }}>공간에 자연을 더하는 테라리움 렌탈 서비스</p>
         </div>
       </section>
 
       {/* 소개 섹션 */}
-      <section style={{ padding: '100px 80px' }}>
+      <section className="responsive-section">
         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 200, marginBottom: '32px', lineHeight: 1.6 }}>
+          <h2 className="section-title-large" style={{ fontWeight: 200, marginBottom: '32px', lineHeight: 1.6 }}>
             비즈니스 공간에<br />자연의 감성을 더합니다
           </h2>
           <p style={{ color: '#888', lineHeight: 1.8 }}>
@@ -94,13 +94,13 @@ function Rental() {
       </section>
 
       {/* 서비스 대상 */}
-      <section style={{ padding: '80px 80px', background: '#0a0a0a' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="responsive-section" style={{ background: '#0a0a0a' }}>
+        <div className="responsive-container">
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>SERVICE FOR</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>이런 공간에 추천합니다</h2>
+            <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>이런 공간에 추천합니다</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+          <div className="grid-4">
             {services.map((service, index) => (
               <div key={index} style={{ padding: '32px', border: '1px solid #333' }}>
                 <div style={{ fontSize: '32px', marginBottom: '24px' }}>{service.icon}</div>
@@ -113,13 +113,13 @@ function Rental() {
       </section>
 
       {/* 프로세스 */}
-      <section style={{ padding: '100px 80px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <section className="responsive-section">
+        <div className="responsive-container">
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>PROCESS</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>렌탈 진행 과정</h2>
+            <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>렌탈 진행 과정</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
+          <div className="grid-4">
             {process.map((item, index) => (
               <div key={index} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '32px', fontWeight: 200, color: '#666', marginBottom: '16px' }}>{item.step}</div>
@@ -132,11 +132,11 @@ function Rental() {
       </section>
 
       {/* 문의 폼 */}
-      <section style={{ padding: '100px 80px', background: '#0a0a0a' }}>
+      <section className="responsive-section" style={{ background: '#0a0a0a' }}>
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <p style={{ fontSize: '12px', letterSpacing: '0.4em', color: '#888', marginBottom: '16px' }}>INQUIRY</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 200, letterSpacing: '0.15em' }}>렌탈 문의하기</h2>
+            <h2 className="section-title" style={{ fontWeight: 200, letterSpacing: '0.15em' }}>렌탈 문의하기</h2>
           </div>
 
           {submitted ? (

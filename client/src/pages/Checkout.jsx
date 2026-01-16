@@ -116,11 +116,11 @@ function Checkout() {
 
   return (
     <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '64px 80px' }}>
+      <div className="responsive-container" style={{ maxWidth: '1000px', paddingTop: '64px', paddingBottom: '64px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', textAlign: 'center', marginBottom: '48px' }}>CHECKOUT</h1>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '48px' }}>
+          <div className="grid-2" style={{ alignItems: 'start' }}>
             {/* 배송 정보 */}
             <div>
               <h2 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '24px' }}>배송 정보</h2>
@@ -174,7 +174,7 @@ function Checkout() {
 
             {/* 주문 요약 */}
             <div>
-              <div style={{ position: 'sticky', top: '100px', padding: '24px', border: '1px solid #333', background: '#0a0a0a' }}>
+              <div className="checkout-summary" style={{ padding: '24px', border: '1px solid #333', background: '#0a0a0a' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '24px' }}>주문 요약</h2>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid #333' }}>

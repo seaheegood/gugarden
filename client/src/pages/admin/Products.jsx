@@ -284,14 +284,14 @@ function Products() {
   return (
     <div className="p-6 lg:p-8">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-wide text-gray-800">상품 관리</h1>
           <p className="text-sm text-gray-500 mt-2">상품을 등록하고 관리하세요</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1.5"
+          className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors flex items-center gap-1.5 whitespace-nowrap"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -301,8 +301,8 @@ function Products() {
       </div>
 
       {/* 필터 */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <form onSubmit={handleSearch} className="flex flex-wrap gap-3 items-center">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 lg:p-4 mb-4 lg:mb-6">
+        <form onSubmit={handleSearch} className="flex flex-col lg:flex-row flex-wrap gap-2 lg:gap-3 items-stretch lg:items-center">
           <select
             value={filter.category}
             onChange={(e) => setFilter((prev) => ({ ...prev, category: e.target.value }))}
@@ -317,20 +317,21 @@ function Products() {
             ))}
           </select>
 
-          <input
-            type="text"
-            value={filter.search}
-            onChange={(e) => setFilter((prev) => ({ ...prev, search: e.target.value }))}
-            placeholder="상품명 검색"
-            className="flex-1 min-w-[180px] bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-500 focus:outline-none"
-          />
-
-          <button
-            type="submit"
-            className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
-          >
-            검색
-          </button>
+          <div className="flex gap-2 lg:flex-1">
+            <input
+              type="text"
+              value={filter.search}
+              onChange={(e) => setFilter((prev) => ({ ...prev, search: e.target.value }))}
+              placeholder="상품명 검색"
+              className="flex-1 min-w-0 bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-500 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors whitespace-nowrap"
+            >
+              검색
+            </button>
+          </div>
         </form>
       </div>
 
@@ -342,7 +343,9 @@ function Products() {
             <p className="text-gray-600 text-sm">로딩 중...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* 데스크톱 테이블 */}
+          <div className="overflow-x-auto hidden lg:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 text-left bg-gray-50">
@@ -435,6 +438,76 @@ function Products() {
               </tbody>
             </table>
           </div>
+
+          {/* 모바일 카드 */}
+          <div className="lg:hidden divide-y divide-gray-100">
+            {products.length > 0 ? (
+              products.map((product) => (
+                <div key={product.id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex gap-3 mb-3">
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                      {product.thumbnail ? (
+                        <img
+                          src={product.thumbnail}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                          No img
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="text-sm font-semibold text-gray-800 line-clamp-2">{product.name}</p>
+                        <span
+                          className={`text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 ${
+                            product.is_active
+                              ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                              : 'bg-gray-100 text-gray-600 border border-gray-200'
+                          }`}
+                        >
+                          {product.is_active ? '활성' : '비활성'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">{product.category_name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-gray-800">₩{formatPrice(product.price)}</p>
+                        {product.sale_price && (
+                          <p className="text-xs text-red-600 font-medium">
+                            ₩{formatPrice(product.sale_price)}
+                          </p>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
+                        재고: <span className={product.stock < 5 ? 'text-red-600 font-semibold' : 'text-gray-700'}>{product.stock}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openModal(product)}
+                      className="flex-1 text-xs font-medium text-gray-700 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      className="flex-1 text-xs font-medium text-red-600 py-2 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-12 text-center text-gray-500 text-sm">
+                상품이 없습니다.
+              </div>
+            )}
+          </div>
+          </>
         )}
 
         {/* 페이지네이션 */}
@@ -459,23 +532,23 @@ function Products() {
 
       {/* 상품 등록/수정 모달 */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-gray-50">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 lg:p-4 p-0">
+          <div className="bg-white rounded-2xl lg:rounded-2xl rounded-none w-full max-w-2xl max-h-[90vh] lg:max-h-[90vh] h-full lg:h-auto overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 lg:px-8 py-4 lg:py-6 border-b border-gray-200 bg-gray-50">
               <div>
-                <h2 className="text-lg font-semibold text-gray-800">
+                <h2 className="text-base lg:text-lg font-semibold text-gray-800">
                   {editingProduct ? '상품 수정' : '상품 등록'}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">상품 정보를 입력하세요</p>
               </div>
-              <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 transition-colors p-1">
+              <button onClick={closeModal} className="text-gray-500 hover:text-gray-700 transition-colors p-1 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-4 lg:p-6 space-y-4 lg:space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">카테고리 *</label>
                 <select
@@ -518,7 +591,7 @@ function Products() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">정가 *</label>
                   <input

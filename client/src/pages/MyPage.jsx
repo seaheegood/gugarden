@@ -134,11 +134,11 @@ function MyPage() {
 
   return (
     <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#000' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '64px 80px' }}>
+      <div className="responsive-container" style={{ maxWidth: '800px', paddingTop: '64px', paddingBottom: '64px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 300, letterSpacing: '0.2em', textAlign: 'center', marginBottom: '48px' }}>MY PAGE</h1>
 
         {/* 탭 메뉴 */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', marginBottom: '48px', borderBottom: '1px solid #333', paddingBottom: '16px' }}>
+        <div className="mypage-tabs" style={{ display: 'flex', justifyContent: 'center', gap: '32px', marginBottom: '48px', borderBottom: '1px solid #333', paddingBottom: '16px' }}>
           {tabs.map((tab) => (
             <button
               key={tab.id}

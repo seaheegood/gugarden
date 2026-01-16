@@ -99,8 +99,8 @@ function Users() {
       </div>
 
       {/* 검색 */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <form onSubmit={handleSearch} className="flex gap-3 items-center">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 lg:p-4 mb-4 lg:mb-6">
+        <form onSubmit={handleSearch} className="flex gap-2 lg:gap-3 items-center">
           <input
             type="text"
             value={search}
@@ -125,7 +125,9 @@ function Users() {
             <p className="text-gray-600 text-sm">로딩 중...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* 데스크톱 테이블 */}
+          <div className="overflow-x-auto hidden lg:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 text-left bg-gray-50">
@@ -186,6 +188,60 @@ function Users() {
               </tbody>
             </table>
           </div>
+
+          {/* 모바일 카드 */}
+          <div className="lg:hidden divide-y divide-gray-100">
+            {users.length > 0 ? (
+              users.map((user) => (
+                <div key={user.id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <button
+                    onClick={() => openUserDetail(user.id)}
+                    className="w-full text-left mb-3"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 mb-1">{user.name}</p>
+                        <p className="text-xs text-gray-600">{user.email}</p>
+                        {user.phone && <p className="text-xs text-gray-500 mt-1">{user.phone}</p>}
+                      </div>
+                      <div className="ml-2 flex-shrink-0">
+                        <select
+                          value={user.role}
+                          onChange={(e) => {
+                            e.stopPropagation()
+                            updateRole(user.id, e.target.value)
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className={`text-xs font-medium px-2 py-1 pr-6 rounded-md border focus:outline-none appearance-none cursor-pointer ${
+                            user.role === 'admin'
+                              ? 'border-amber-300 bg-amber-50 text-amber-700'
+                              : 'border-gray-300 bg-white text-gray-700'
+                          }`}
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.3rem center', backgroundRepeat: 'no-repeat', backgroundSize: '0.9em 0.9em' }}
+                        >
+                          <option value="user">일반</option>
+                          <option value="admin">관리자</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div>
+                        <span className="text-gray-600">{user.order_count}건 주문</span>
+                        <span className="text-gray-400 mx-1.5">·</span>
+                        <span className="font-semibold text-gray-800">₩{formatPrice(user.total_spent)}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">{formatDate(user.created_at)} 가입</p>
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-12 text-center text-gray-500 text-sm">
+                회원이 없습니다.
+              </div>
+            )}
+          </div>
+          </>
         )}
 
         {/* 페이지네이션 */}
@@ -210,16 +266,16 @@ function Users() {
 
       {/* 회원 상세 모달 */}
       {showModal && selectedUser && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-gray-50">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">회원 상세</h2>
-                <p className="text-xs text-gray-500 mt-1">{selectedUser.email}</p>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 lg:p-4 p-0">
+          <div className="bg-white rounded-2xl lg:rounded-2xl rounded-none w-full max-w-xl max-h-[90vh] lg:max-h-[90vh] h-full lg:h-auto overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 lg:px-8 py-4 lg:py-6 border-b border-gray-200 bg-gray-50">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base lg:text-lg font-semibold text-gray-800">회원 상세</h2>
+                <p className="text-xs text-gray-500 mt-1 truncate">{selectedUser.email}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-gray-700 transition-colors p-1"
+                className="text-gray-500 hover:text-gray-700 transition-colors p-1 flex-shrink-0"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -227,7 +283,7 @@ function Users() {
               </button>
             </div>
 
-            <div className="p-8 space-y-6">
+            <div className="p-4 lg:p-8 space-y-5 lg:space-y-6">
               {/* 기본 정보 */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-800 mb-3">기본 정보</h3>
