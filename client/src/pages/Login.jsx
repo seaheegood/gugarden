@@ -97,7 +97,7 @@ function Login() {
           {/* 네이버 로그인 */}
           <button
             type="button"
-            onClick={() => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/naver`}
+            onClick={() => window.location.href = '/api/auth/naver'}
             style={{
               width: '100%',
               padding: '14px',
@@ -119,7 +119,7 @@ function Login() {
           {/* 카카오 로그인 */}
           <button
             type="button"
-            onClick={() => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/kakao`}
+            onClick={() => window.location.href = '/api/auth/kakao'}
             style={{
               width: '100%',
               padding: '14px',

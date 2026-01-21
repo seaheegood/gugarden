@@ -1,0 +1,55 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # 수동 실행 가능
+
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  DEPLOY_PATH: /var/www/gugarden
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
+            cd ${{ env.DEPLOY_PATH }}
+
+            # Git pull
+            git pull origin main
+
+            # Docker 빌드 및 실행
+            docker compose down
+            docker compose build --no-cache
+            docker compose up -d
+
+            # 정리
+            docker image prune -f
+
+            echo "Deployment completed!"
+          ENDSSH
+
+      - name: Health check
+        run: |
+          sleep 10
+          curl -f https://${{ secrets.DOMAIN }}/api/health || exit 1
+          echo "Health check passed!"

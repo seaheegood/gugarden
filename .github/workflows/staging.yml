@@ -1,0 +1,51 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  DEPLOY_PATH: /var/www/gugarden-staging
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to staging
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
+            cd ${{ env.DEPLOY_PATH }}
+
+            # Git pull
+            git pull origin develop
+
+            # Docker 빌드 및 실행 (staging 포트: 3001)
+            docker compose -f docker-compose.staging.yml down
+            docker compose -f docker-compose.staging.yml build --no-cache
+            docker compose -f docker-compose.staging.yml up -d
+
+            echo "Staging deployment completed!"
+          ENDSSH
+
+      - name: Health check
+        run: |
+          sleep 10
+          curl -f https://staging.${{ secrets.DOMAIN }}/api/health || exit 1

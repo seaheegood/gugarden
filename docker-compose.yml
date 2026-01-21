@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Node.js 백엔드
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: gugarden-server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server/uploads:/app/uploads
+    networks:
+      - gugarden-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx 프론트엔드
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: gugarden-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - gugarden-network
+
+networks:
+  gugarden-network:
+    driver: bridge
