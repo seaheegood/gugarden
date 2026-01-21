@@ -345,4 +345,278 @@ function generateSignature(timestamp, data) {
     .digest('base64')
 }
 
+// ==================== 토스페이먼츠 API ====================
+
+const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY
+const TOSS_API_URL = 'https://api.tosspayments.com/v1'
+
+// 토스페이먼츠 결제 준비
+router.post('/toss/prepare', auth, async (req, res) => {
+  try {
+    const { orderId } = req.body
+
+    // 주문 정보 조회
+    const [orders] = await pool.query(
+      'SELECT * FROM orders WHERE id = ? AND user_id = ?',
+      [orderId, req.user.id]
+    )
+
+    if (orders.length === 0) {
+      return res.status(404).json({ error: '주문을 찾을 수 없습니다.' })
+    }
+
+    const order = orders[0]
+
+    if (order.status !== 'pending') {
+      return res.status(400).json({ error: '이미 처리된 주문입니다.' })
+    }
+
+    // 주문 상품 조회
+    const [items] = await pool.query(
+      'SELECT product_name, quantity FROM order_items WHERE order_id = ?',
+      [orderId]
+    )
+
+    // 상품명 생성
+    const orderName = items.length > 1
+      ? `${items[0].product_name} 외 ${items.length - 1}건`
+      : items[0].product_name
+
+    // 토스페이먼츠 API 키가 없으면 테스트 모드
+    if (!TOSS_SECRET_KEY) {
+      return res.json({
+        success: true,
+        testMode: true,
+        message: '테스트 모드: 토스페이먼츠 API 키가 설정되지 않았습니다.',
+        orderId: orderId,
+        orderNumber: order.order_number,
+        amount: order.total_amount,
+        orderName
+      })
+    }
+
+    // 클라이언트에서 사용할 결제 정보 반환
+    res.json({
+      success: true,
+      orderId: orderId,
+      orderNumber: order.order_number,
+      amount: order.total_amount,
+      orderName,
+      customerName: order.recipient_name,
+      customerEmail: req.user.email
+    })
+  } catch (error) {
+    console.error('토스 결제 준비 에러:', error)
+    res.status(500).json({ error: '결제 준비에 실패했습니다.' })
+  }
+})
+
+// 토스페이먼츠 결제 승인
+router.post('/toss/confirm', auth, async (req, res) => {
+  const connection = await pool.getConnection()
+
+  try {
+    await connection.beginTransaction()
+
+    const { orderId, paymentKey, amount } = req.body
+
+    // 주문 정보 조회
+    const [orders] = await connection.query(
+      'SELECT * FROM orders WHERE id = ? AND user_id = ?',
+      [orderId, req.user.id]
+    )
+
+    if (orders.length === 0) {
+      return res.status(404).json({ error: '주문을 찾을 수 없습니다.' })
+    }
+
+    const order = orders[0]
+
+    // 금액 검증
+    if (order.total_amount !== amount) {
+      return res.status(400).json({ error: '결제 금액이 일치하지 않습니다.' })
+    }
+
+    // 테스트 모드 처리
+    if (!TOSS_SECRET_KEY) {
+      await connection.query(
+        'UPDATE orders SET status = ?, payment_method = ?, payment_key = ?, paid_at = NOW() WHERE id = ?',
+        ['paid', 'toss', paymentKey || 'test_payment', orderId]
+      )
+
+      await connection.commit()
+
+      return res.json({
+        success: true,
+        testMode: true,
+        message: '테스트 결제가 완료되었습니다.',
+        orderId,
+        orderNumber: order.order_number
+      })
+    }
+
+    // 토스페이먼츠 결제 승인 API 호출
+    const encryptedSecretKey = Buffer.from(TOSS_SECRET_KEY + ':').toString('base64')
+
+    const response = await axios.post(
+      `${TOSS_API_URL}/payments/confirm`,
+      {
+        paymentKey,
+        orderId: order.order_number,
+        amount
+      },
+      {
+        headers: {
+          'Authorization': `Basic ${encryptedSecretKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    if (response.data.status === 'DONE') {
+      // 주문 상태 업데이트
+      await connection.query(
+        'UPDATE orders SET status = ?, payment_method = ?, payment_key = ?, paid_at = NOW() WHERE id = ?',
+        ['paid', 'toss', paymentKey, orderId]
+      )
+
+      await connection.commit()
+
+      res.json({
+        success: true,
+        orderId,
+        orderNumber: order.order_number,
+        paymentKey
+      })
+    } else {
+      await connection.rollback()
+      res.status(400).json({
+        success: false,
+        error: '결제 승인에 실패했습니다.'
+      })
+    }
+  } catch (error) {
+    await connection.rollback()
+    console.error('토스 결제 승인 에러:', error.response?.data || error.message)
+    res.status(500).json({
+      error: error.response?.data?.message || '결제 승인에 실패했습니다.'
+    })
+  } finally {
+    connection.release()
+  }
+})
+
+// 토스페이먼츠 결제 취소
+router.post('/toss/cancel', auth, async (req, res) => {
+  const connection = await pool.getConnection()
+
+  try {
+    await connection.beginTransaction()
+
+    const { orderId, cancelReason } = req.body
+
+    // 주문 정보 조회
+    const [orders] = await connection.query(
+      'SELECT * FROM orders WHERE id = ? AND user_id = ?',
+      [orderId, req.user.id]
+    )
+
+    if (orders.length === 0) {
+      return res.status(404).json({ error: '주문을 찾을 수 없습니다.' })
+    }
+
+    const order = orders[0]
+
+    if (order.status !== 'paid') {
+      return res.status(400).json({ error: '결제된 주문만 취소할 수 있습니다.' })
+    }
+
+    // 테스트 모드 처리
+    if (!TOSS_SECRET_KEY) {
+      // 재고 복구
+      const [items] = await connection.query(
+        'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+        [orderId]
+      )
+
+      for (const item of items) {
+        await connection.query(
+          'UPDATE products SET stock = stock + ? WHERE id = ?',
+          [item.quantity, item.product_id]
+        )
+      }
+
+      await connection.query(
+        'UPDATE orders SET status = ? WHERE id = ?',
+        ['cancelled', orderId]
+      )
+
+      await connection.commit()
+
+      return res.json({
+        success: true,
+        testMode: true,
+        message: '테스트 결제가 취소되었습니다.'
+      })
+    }
+
+    // 토스페이먼츠 결제 취소 API 호출
+    const encryptedSecretKey = Buffer.from(TOSS_SECRET_KEY + ':').toString('base64')
+
+    const response = await axios.post(
+      `${TOSS_API_URL}/payments/${order.payment_key}/cancel`,
+      {
+        cancelReason: cancelReason || '고객 요청에 의한 취소'
+      },
+      {
+        headers: {
+          'Authorization': `Basic ${encryptedSecretKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    if (response.data.status === 'CANCELED') {
+      // 재고 복구
+      const [items] = await connection.query(
+        'SELECT product_id, quantity FROM order_items WHERE order_id = ?',
+        [orderId]
+      )
+
+      for (const item of items) {
+        await connection.query(
+          'UPDATE products SET stock = stock + ? WHERE id = ?',
+          [item.quantity, item.product_id]
+        )
+      }
+
+      await connection.query(
+        'UPDATE orders SET status = ? WHERE id = ?',
+        ['cancelled', orderId]
+      )
+
+      await connection.commit()
+
+      res.json({
+        success: true,
+        message: '결제가 취소되었습니다.'
+      })
+    } else {
+      await connection.rollback()
+      res.status(400).json({
+        success: false,
+        error: '결제 취소에 실패했습니다.'
+      })
+    }
+  } catch (error) {
+    await connection.rollback()
+    console.error('토스 결제 취소 에러:', error.response?.data || error.message)
+    res.status(500).json({
+      error: error.response?.data?.message || '결제 취소에 실패했습니다.'
+    })
+  } finally {
+    connection.release()
+  }
+})
+
 module.exports = router

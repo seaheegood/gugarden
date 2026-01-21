@@ -2,14 +2,34 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const path = require('path')
+const session = require('express-session')
+const passport = require('./config/passport')
 
 const app = express()
 const PORT = process.env.PORT || 5000
 
 // 미들웨어
-app.use(cors())
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// 세션 설정 (소셜 로그인용)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'gugarden-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24시간
+  }
+}))
+
+// Passport 초기화
+app.use(passport.initialize())
+app.use(passport.session())
 
 // 정적 파일 (업로드된 이미지)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))

@@ -8,13 +8,16 @@ USE gugarden;
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NULL,  -- 소셜 로그인 시 NULL 허용
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
     address TEXT,
     address_detail VARCHAR(255),
     zipcode VARCHAR(10),
     role ENUM('user', 'admin') DEFAULT 'user',
+    provider ENUM('local', 'naver', 'kakao') DEFAULT 'local',
+    provider_id VARCHAR(255) NULL,
+    profile_image VARCHAR(500) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

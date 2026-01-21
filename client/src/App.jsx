@@ -15,6 +15,9 @@ import Checkout from './pages/Checkout'
 import OrderComplete from './pages/OrderComplete'
 import OrderDetail from './pages/OrderDetail'
 import PaymentComplete from './pages/PaymentComplete'
+import AuthCallback from './pages/AuthCallback'
+import TossPaymentSuccess from './pages/TossPaymentSuccess'
+import TossPaymentFail from './pages/TossPaymentFail'
 import AdminLayout from './components/AdminLayout'
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminProducts from './pages/admin/Products'
@@ -119,6 +122,25 @@ function AppRoutes() {
           element={
             <PrivateRoute>
               <PaymentComplete />
+            </PrivateRoute>
+          }
+        />
+        {/* 소셜 로그인 콜백 */}
+        <Route path="auth/callback" element={<AuthCallback />} />
+        {/* 토스페이먼츠 결제 결과 */}
+        <Route
+          path="payment/toss/success"
+          element={
+            <PrivateRoute>
+              <TossPaymentSuccess />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="payment/toss/fail"
+          element={
+            <PrivateRoute>
+              <TossPaymentFail />
             </PrivateRoute>
           }
         />

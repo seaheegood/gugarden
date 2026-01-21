@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../api'
 
+const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq'
+
 function Checkout() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -10,6 +12,7 @@ function Checkout() {
   const [totalAmount, setTotalAmount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState('naverpay')
 
   const [formData, setFormData] = useState({
     recipientName: '',
@@ -70,6 +73,7 @@ function Checkout() {
     }
     setSubmitting(true)
     try {
+      // 주문 생성
       const orderResponse = await api.post('/orders', {
         recipientName: formData.recipientName,
         recipientPhone: formData.recipientPhone,
@@ -77,18 +81,54 @@ function Checkout() {
         recipientAddress: formData.recipientAddress,
         recipientAddressDetail: formData.recipientAddressDetail,
         memo: formData.memo,
+        paymentMethod: paymentMethod === 'toss' ? 'toss' : 'naverpay',
       })
       const orderId = orderResponse.data.orderId
-      const paymentResponse = await api.post('/payments/prepare', { orderId })
-      if (paymentResponse.data.testMode) {
-        const approveResponse = await api.post('/payments/approve', { orderId })
-        if (approveResponse.data.success) {
-          navigate(`/payment/complete?orderId=${orderId}`)
-        } else {
-          alert(approveResponse.data.error || '결제 승인에 실패했습니다.')
+
+      if (paymentMethod === 'naverpay') {
+        // 네이버페이 결제
+        const paymentResponse = await api.post('/payments/prepare', { orderId })
+        if (paymentResponse.data.testMode) {
+          const approveResponse = await api.post('/payments/approve', { orderId })
+          if (approveResponse.data.success) {
+            navigate(`/payment/complete?orderId=${orderId}`)
+          } else {
+            alert(approveResponse.data.error || '결제 승인에 실패했습니다.')
+          }
+        } else if (paymentResponse.data.paymentUrl) {
+          window.location.href = paymentResponse.data.paymentUrl
         }
-      } else if (paymentResponse.data.paymentUrl) {
-        window.location.href = paymentResponse.data.paymentUrl
+      } else if (paymentMethod === 'toss') {
+        // 토스페이먼츠 결제
+        const paymentResponse = await api.post('/payments/toss/prepare', { orderId })
+
+        if (paymentResponse.data.testMode) {
+          // 테스트 모드: 바로 결제 완료 처리
+          const confirmResponse = await api.post('/payments/toss/confirm', {
+            orderId,
+            paymentKey: 'test_payment_key',
+            amount: paymentResponse.data.amount
+          })
+          if (confirmResponse.data.success) {
+            navigate(`/payment/complete?orderId=${orderId}`)
+          } else {
+            alert(confirmResponse.data.error || '결제 승인에 실패했습니다.')
+          }
+        } else {
+          // 토스페이먼츠 SDK로 결제창 호출
+          const tossPayments = window.TossPayments(TOSS_CLIENT_KEY)
+          const clientUrl = import.meta.env.VITE_CLIENT_URL || window.location.origin
+
+          await tossPayments.requestPayment('카드', {
+            amount: paymentResponse.data.amount,
+            orderId: paymentResponse.data.orderNumber,
+            orderName: paymentResponse.data.orderName,
+            customerName: paymentResponse.data.customerName,
+            customerEmail: paymentResponse.data.customerEmail,
+            successUrl: `${clientUrl}/payment/toss/success?orderId=${orderId}`,
+            failUrl: `${clientUrl}/payment/toss/fail?orderId=${orderId}`
+          })
+        }
       }
     } catch (error) {
       alert(error.response?.data?.error || '주문에 실패했습니다.')
@@ -160,14 +200,70 @@ function Checkout() {
               {/* 결제 수단 */}
               <div style={{ marginTop: '48px' }}>
                 <h2 style={{ fontSize: '18px', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '24px' }}>결제 수단</h2>
-                <div style={{ padding: '16px', border: '1px solid #333', background: '#0a0a0a', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ width: '20px', height: '20px', border: '2px solid #fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ width: '10px', height: '10px', background: '#fff', borderRadius: '50%' }} />
-                  </div>
-                  <div style={{ background: '#03C75A', padding: '6px 12px', borderRadius: '4px' }}>
-                    <span style={{ color: '#fff', fontSize: '14px', fontWeight: 'bold' }}>N Pay</span>
-                  </div>
-                  <span style={{ fontSize: '14px', color: '#ccc' }}>네이버페이</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* 네이버페이 */}
+                  <label
+                    style={{
+                      padding: '16px',
+                      border: paymentMethod === 'naverpay' ? '1px solid #03C75A' : '1px solid #333',
+                      background: '#0a0a0a',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setPaymentMethod('naverpay')}
+                  >
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      border: paymentMethod === 'naverpay' ? '2px solid #03C75A' : '2px solid #666',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {paymentMethod === 'naverpay' && (
+                        <div style={{ width: '10px', height: '10px', background: '#03C75A', borderRadius: '50%' }} />
+                      )}
+                    </div>
+                    <div style={{ background: '#03C75A', padding: '6px 12px', borderRadius: '4px' }}>
+                      <span style={{ color: '#fff', fontSize: '14px', fontWeight: 'bold' }}>N Pay</span>
+                    </div>
+                    <span style={{ fontSize: '14px', color: '#ccc' }}>네이버페이</span>
+                  </label>
+
+                  {/* 토스페이먼츠 */}
+                  <label
+                    style={{
+                      padding: '16px',
+                      border: paymentMethod === 'toss' ? '1px solid #0064FF' : '1px solid #333',
+                      background: '#0a0a0a',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setPaymentMethod('toss')}
+                  >
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      border: paymentMethod === 'toss' ? '2px solid #0064FF' : '2px solid #666',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {paymentMethod === 'toss' && (
+                        <div style={{ width: '10px', height: '10px', background: '#0064FF', borderRadius: '50%' }} />
+                      )}
+                    </div>
+                    <div style={{ background: '#0064FF', padding: '6px 12px', borderRadius: '4px' }}>
+                      <span style={{ color: '#fff', fontSize: '14px', fontWeight: 'bold' }}>toss</span>
+                    </div>
+                    <span style={{ fontSize: '14px', color: '#ccc' }}>토스페이먼츠 (카드)</span>
+                  </label>
                 </div>
               </div>
             </div>

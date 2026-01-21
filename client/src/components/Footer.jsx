@@ -177,7 +177,7 @@ function Footer() {
           }}
         >
           <p style={{ fontSize: "12px", color: "#555" }}>
-            &copy; 2025 구의정원. All rights reserved.
+            &copy; 2026 구의정원. All rights reserved.
           </p>
           <div style={{ display: "flex", gap: "20px" }}>
             <a

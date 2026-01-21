@@ -53,6 +53,13 @@ export function AuthProvider({ children }) {
     setUser((prev) => ({ ...prev, ...userData }))
   }
 
+  const socialLogin = async (token) => {
+    localStorage.setItem('token', token)
+    const response = await api.get('/auth/me')
+    setUser(response.data.user)
+    return response.data.user
+  }
+
   const value = {
     user,
     loading,
@@ -60,6 +67,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     updateUser,
+    socialLogin,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
   }

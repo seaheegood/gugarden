@@ -121,7 +121,9 @@ function PaymentComplete() {
                 <span>결제 금액</span>
                 <span>₩ {formatPrice(order.total_amount)}</span>
               </div>
-              <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>네이버페이로 결제되었습니다.</p>
+              <p style={{ fontSize: '12px', color: '#888', marginTop: '8px' }}>
+                {order.payment_method === 'toss' ? '토스페이먼츠로' : '네이버페이로'} 결제되었습니다.
+              </p>
             </div>
           </div>
         )}

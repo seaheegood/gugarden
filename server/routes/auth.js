@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const passport = require('passport')
 const pool = require('../config/db')
 const auth = require('../middleware/auth')
 
@@ -170,5 +171,42 @@ router.put('/password', auth, async (req, res) => {
     res.status(500).json({ error: '비밀번호 변경에 실패했습니다.' })
   }
 })
+
+// JWT 토큰 생성 헬퍼 함수
+function generateToken(user) {
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+  )
+}
+
+// ==================== 소셜 로그인 ====================
+
+// 네이버 로그인
+router.get('/naver', passport.authenticate('naver'))
+
+// 네이버 콜백
+router.get('/naver/callback',
+  passport.authenticate('naver', { failureRedirect: '/login?error=naver_failed' }),
+  (req, res) => {
+    const token = generateToken(req.user)
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173'
+    res.redirect(`${clientUrl}/auth/callback?token=${token}`)
+  }
+)
+
+// 카카오 로그인
+router.get('/kakao', passport.authenticate('kakao'))
+
+// 카카오 콜백
+router.get('/kakao/callback',
+  passport.authenticate('kakao', { failureRedirect: '/login?error=kakao_failed' }),
+  (req, res) => {
+    const token = generateToken(req.user)
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173'
+    res.redirect(`${clientUrl}/auth/callback?token=${token}`)
+  }
+)
 
 module.exports = router

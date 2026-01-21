@@ -85,6 +85,62 @@ function Login() {
           </button>
         </form>
 
+        {/* 소셜 로그인 구분선 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '32px 0' }}>
+          <div style={{ flex: 1, height: '1px', background: '#333' }} />
+          <span style={{ fontSize: '12px', color: '#666' }}>또는</span>
+          <div style={{ flex: 1, height: '1px', background: '#333' }} />
+        </div>
+
+        {/* 소셜 로그인 버튼 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* 네이버 로그인 */}
+          <button
+            type="button"
+            onClick={() => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/naver`}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: '#03C75A',
+              color: '#fff',
+              fontSize: '14px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <span style={{ fontWeight: 'bold' }}>N</span>
+            네이버 로그인
+          </button>
+
+          {/* 카카오 로그인 */}
+          <button
+            type="button"
+            onClick={() => window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/kakao`}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: '#FEE500',
+              color: '#000',
+              fontSize: '14px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18">
+              <path fill="#000" d="M9 1C4.58 1 1 3.79 1 7.21c0 2.17 1.45 4.08 3.64 5.18-.16.57-.58 2.06-.67 2.38-.1.4.15.4.31.29.13-.08 2.04-1.38 2.86-1.94.62.09 1.25.13 1.86.13 4.42 0 8-2.79 8-6.21S13.42 1 9 1"/>
+            </svg>
+            카카오 로그인
+          </button>
+        </div>
+
         <div style={{ marginTop: '32px', textAlign: 'center' }}>
           <p style={{ fontSize: '14px', color: '#888' }}>
             아직 회원이 아니신가요?{' '}
