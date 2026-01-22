@@ -6,11 +6,6 @@ on:
       - develop
   workflow_dispatch:
 
-env:
-  SERVER_HOST: ${{ secrets.SERVER_HOST }}
-  SERVER_USER: ${{ secrets.SERVER_USER }}
-  DEPLOY_PATH: /var/www/gugarden-staging
-
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
@@ -18,6 +13,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.SERVER_HOST }}" ]; then
+            echo "❌ SERVER_HOST secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SERVER_USER }}" ]; then
+            echo "❌ SERVER_USER secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ SSH_PRIVATE_KEY secret is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
 
       - name: Setup SSH key
         uses: webfactory/ssh-agent@v0.8.0
@@ -30,9 +41,12 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to staging
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'ENDSSH'
-            cd ${{ env.DEPLOY_PATH }}
+          ssh ${SERVER_USER}@${SERVER_HOST} << 'ENDSSH'
+            cd /var/www/gugarden-staging
 
             # Git pull
             git pull origin develop
@@ -46,6 +60,7 @@ jobs:
           ENDSSH
 
       - name: Health check
+        if: ${{ secrets.DOMAIN != '' }}
         run: |
           sleep 10
           curl -f https://staging.${{ secrets.DOMAIN }}/api/health || exit 1

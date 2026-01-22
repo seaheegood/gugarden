@@ -2,101 +2,132 @@
 
 ## 개요
 
-- **웹서버**: Apache2
-- **백엔드**: Node.js + Express (PM2로 프로세스 관리)
-- **프론트엔드**: React (Vite 빌드)
+- **컨테이너**: Docker + Docker Compose
+- **CI/CD**: GitHub Actions
+- **웹서버**: Nginx (Docker 컨테이너)
+- **백엔드**: Node.js + Express (Docker 컨테이너)
 - **데이터베이스**: MySQL 8.0 (외부 DB 서버)
-- **SSL**: Let's Encrypt
+- **SSL**: Let's Encrypt (외부 리버스 프록시에서 처리)
 
 ---
 
-## 1. 서버 환경 확인
+## 아키텍처
 
-```bash
-# Node.js 버전 확인
-node -v
-
-# npm 버전 확인
-npm -v
-
-# MySQL 클라이언트 확인
-mysql --version
-
-# Apache 확인
-apache2 -v
+```
+┌─────────────────────────────────────────────────────────┐
+│                    GitHub Actions                        │
+│  (main → Production, develop → Staging 자동 배포)        │
+└─────────────────────────┬───────────────────────────────┘
+                          │ SSH
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                      서버                                │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │              Docker Compose                      │    │
+│  │  ┌───────────────┐    ┌───────────────────┐     │    │
+│  │  │  Nginx        │    │  Node.js Server   │     │    │
+│  │  │  (Client)     │───▶│  (API)            │     │    │
+│  │  │  Port: 3000   │    │  Port: 5000       │     │    │
+│  │  └───────────────┘    └───────────────────┘     │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+                   ┌─────────────┐
+                   │  MySQL 8.0  │
+                   │  (외부 DB)   │
+                   └─────────────┘
 ```
 
 ---
 
-## 2. 필수 패키지 설치
+## 1. 사전 요구사항
+
+### 서버 환경
 
 ```bash
-# PM2 설치 (Node.js 프로세스 관리)
-npm install -g pm2
+# Docker 설치 확인
+docker --version
 
-# Apache 모듈 활성화
-a2enmod proxy proxy_http rewrite headers
+# Docker Compose 설치 확인
+docker compose version
+
+# Git 설치 확인
+git --version
+```
+
+### GitHub Secrets 설정
+
+GitHub 리포지토리 설정에서 다음 Secrets를 추가:
+
+| Secret 이름 | 설명 |
+|------------|------|
+| `SERVER_HOST` | 배포 서버 IP 또는 도메인 |
+| `SERVER_USER` | SSH 접속 사용자명 |
+| `SSH_PRIVATE_KEY` | SSH 개인키 |
+| `DOMAIN` | 서비스 도메인 (헬스체크용) |
+
+---
+
+## 2. 자동 배포 (GitHub Actions)
+
+### Production 배포
+
+- **트리거**: `main` 브랜치에 push
+- **배포 경로**: `/var/www/gugarden`
+
+```bash
+# main 브랜치에 push하면 자동 배포
+git push origin main
+```
+
+### Staging 배포
+
+- **트리거**: `develop` 브랜치에 push
+- **배포 경로**: `/var/www/gugarden-staging`
+
+```bash
+# develop 브랜치에 push하면 자동 배포
+git push origin develop
+```
+
+### 수동 배포
+
+GitHub Actions 페이지에서 "Run workflow" 버튼으로 수동 실행 가능
+
+---
+
+## 3. 수동 배포 (스크립트 사용)
+
+서버에 직접 접속하여 배포할 경우:
+
+```bash
+# Production 배포
+./scripts/deploy.sh production
+
+# Staging 배포
+./scripts/deploy.sh staging
 ```
 
 ---
 
-## 3. 데이터베이스 설정
+## 4. 서버 초기 설정
+
+### 4.1 디렉토리 생성 및 클론
 
 ```bash
-# 외부 DB 서버에 접속하여 데이터베이스 생성
-mysql -h [DB_HOST] -u[DB_USER] -p
-
-# MySQL 접속 후
-CREATE DATABASE IF NOT EXISTS gugarden
-  DEFAULT CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-# 스키마 적용
-mysql -h [DB_HOST] -u[DB_USER] -p gugarden < database/schema.sql
-```
-
----
-
-## 4. 프로젝트 배포
-
-### 4.1 디렉토리 생성
-
-```bash
+# Production
 mkdir -p /var/www/gugarden
+cd /var/www/gugarden
+git clone https://github.com/your-username/gugarden.git .
+
+# Staging
+mkdir -p /var/www/gugarden-staging
+cd /var/www/gugarden-staging
+git clone -b develop https://github.com/your-username/gugarden.git .
 ```
 
-### 4.2 클라이언트 빌드
-
-```bash
-# 로컬에서 빌드
-cd client
-npm run build
-```
-
-### 4.3 파일 업로드
-
-```bash
-# 서버 파일 업로드 (node_modules, .env 제외)
-rsync -avz --exclude 'node_modules' --exclude '.env' \
-  server/ user@server:/var/www/gugarden/server/
-
-# 클라이언트 빌드 파일 업로드
-rsync -avz client/dist/ user@server:/var/www/gugarden/client/
-
-# 데이터베이스 스키마 업로드
-rsync -avz database/ user@server:/var/www/gugarden/database/
-```
-
-### 4.4 서버에서 npm 패키지 설치
-
-```bash
-cd /var/www/gugarden/server
-npm install
-```
-
----
-
-## 5. 환경변수 설정
+### 4.2 환경변수 설정
 
 `/var/www/gugarden/server/.env` 파일 생성:
 
@@ -118,11 +149,6 @@ JWT_EXPIRES_IN=7d
 # 세션 설정
 SESSION_SECRET=your_session_secret
 
-# 네이버페이 설정
-NAVERPAY_CLIENT_ID=
-NAVERPAY_CLIENT_SECRET=
-NAVERPAY_CHAIN_ID=
-
 # 네이버 소셜 로그인
 NAVER_CLIENT_ID=
 NAVER_CLIENT_SECRET=
@@ -141,109 +167,99 @@ TOSS_SECRET_KEY=
 CLIENT_URL=https://your-domain.com
 ```
 
----
-
-## 6. Apache 가상 호스트 설정
-
-`/etc/apache2/sites-available/gugarden.conf` 파일 생성:
-
-```apache
-<VirtualHost *:80>
-    ServerName your-domain.com
-    DocumentRoot /var/www/gugarden/client
-
-    <Directory /var/www/gugarden/client>
-        Options -Indexes +FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    # API 프록시
-    ProxyPreserveHost On
-    ProxyPass /api http://127.0.0.1:5000/api
-    ProxyPassReverse /api http://127.0.0.1:5000/api
-
-    # 업로드 파일 프록시
-    ProxyPass /uploads http://127.0.0.1:5000/uploads
-    ProxyPassReverse /uploads http://127.0.0.1:5000/uploads
-
-    # SPA 라우팅
-    <Directory /var/www/gugarden/client>
-        RewriteEngine On
-        RewriteBase /
-        RewriteRule ^index\.html$ - [L]
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule . /index.html [L]
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/gugarden_error.log
-    CustomLog ${APACHE_LOG_DIR}/gugarden_access.log combined
-</VirtualHost>
-```
-
-### 사이트 활성화
+### 4.3 데이터베이스 초기화
 
 ```bash
-a2ensite gugarden.conf
-apache2ctl configtest
-systemctl reload apache2
+# 외부 DB 서버에 접속하여 데이터베이스 생성
+mysql -h [DB_HOST] -u[DB_USER] -p
+
+# MySQL 접속 후
+CREATE DATABASE IF NOT EXISTS gugarden
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+# 스키마 적용
+mysql -h [DB_HOST] -u[DB_USER] -p gugarden < database/schema.sql
 ```
 
 ---
 
-## 7. PM2로 Node.js 서버 실행
+## 5. Docker 컨테이너 관리
+
+### 컨테이너 시작
 
 ```bash
-cd /var/www/gugarden/server
-
-# 서버 시작
-pm2 start server.js --name gugarden
-
-# 프로세스 저장 (재부팅 시 자동 시작)
-pm2 save
-
-# 시스템 시작 시 PM2 자동 실행 설정
-pm2 startup
+cd /var/www/gugarden
+docker compose up -d
 ```
 
-### PM2 유용한 명령어
+### 컨테이너 중지
 
 ```bash
-# 상태 확인
-pm2 status
+docker compose down
+```
 
-# 로그 보기
-pm2 logs gugarden
+### 컨테이너 재빌드
 
-# 서버 재시작
-pm2 restart gugarden
+```bash
+docker compose build --no-cache
+docker compose up -d
+```
 
-# 서버 중지
-pm2 stop gugarden
+### 로그 확인
+
+```bash
+# 모든 컨테이너 로그
+docker compose logs -f
+
+# 서버 로그만
+docker compose logs -f server
+
+# 클라이언트 로그만
+docker compose logs -f client
+```
+
+### 컨테이너 상태 확인
+
+```bash
+docker compose ps
 ```
 
 ---
 
-## 8. SSL 인증서 설치 (Let's Encrypt)
+## 6. 디렉토리 구조
 
-```bash
-# Certbot 설치 (없는 경우)
-apt install -y certbot python3-certbot-apache
-
-# SSL 인증서 발급 및 자동 설정
-certbot --apache -d your-domain.com --redirect
 ```
-
-인증서는 자동으로 갱신됩니다 (90일마다).
+/var/www/gugarden/
+├── .github/
+│   └── workflows/
+│       ├── deploy.yml         # Production 배포 워크플로우
+│       └── staging.yml        # Staging 배포 워크플로우
+├── client/
+│   ├── Dockerfile             # 프론트엔드 Docker 이미지
+│   ├── nginx.conf             # Nginx 설정
+│   └── ...
+├── server/
+│   ├── Dockerfile             # 백엔드 Docker 이미지
+│   ├── .env                   # 환경변수 (Git 제외)
+│   ├── uploads/               # 업로드 파일 (볼륨 마운트)
+│   └── ...
+├── database/
+│   ├── schema.sql
+│   └── seed.sql
+├── scripts/
+│   └── deploy.sh              # 수동 배포 스크립트
+├── docker-compose.yml         # 개발/기본 설정
+└── docker-compose.prod.yml    # 프로덕션 설정
+```
 
 ---
 
-## 9. 배포 후 확인
+## 7. 헬스 체크
 
 ```bash
 # API 헬스 체크
-curl https://your-domain.com/api/health
+curl http://localhost:3000/api/health
 
 # 예상 응답
 # {"status":"ok","timestamp":"..."}
@@ -251,48 +267,101 @@ curl https://your-domain.com/api/health
 
 ---
 
-## 디렉토리 구조
+## 8. 문제 해결
 
+### Docker 로그 확인
+
+```bash
+# 서버 로그
+docker compose logs -f server
+
+# Nginx 로그
+docker compose logs -f client
 ```
-/var/www/gugarden/
-├── client/          # 프론트엔드 빌드 파일
-│   ├── index.html
-│   ├── assets/
-│   └── images/
-├── server/          # 백엔드 서버
-│   ├── server.js
-│   ├── package.json
-│   ├── .env
-│   ├── config/
-│   ├── routes/
-│   ├── middleware/
-│   └── uploads/
-└── database/        # DB 스키마
-    ├── schema.sql
-    └── seed.sql
+
+### 컨테이너 내부 접속
+
+```bash
+# 서버 컨테이너
+docker exec -it gugarden-server sh
+
+# 클라이언트 컨테이너
+docker exec -it gugarden-client sh
+```
+
+### 컨테이너 재시작
+
+```bash
+docker compose restart server
+docker compose restart client
+```
+
+### 이미지 정리
+
+```bash
+# 사용하지 않는 이미지 삭제
+docker image prune -f
+
+# 모든 미사용 리소스 정리
+docker system prune -f
+```
+
+### DB 연결 테스트
+
+```bash
+mysql -h [DB_HOST] -u[DB_USER] -p -e "SELECT 1"
 ```
 
 ---
 
-## 문제 해결
+## 9. 롤백
 
-### PM2 로그 확인
+문제 발생 시 이전 버전으로 롤백:
+
 ```bash
-pm2 logs gugarden --lines 50
+cd /var/www/gugarden
+
+# 이전 커밋으로 체크아웃
+git log --oneline -10  # 최근 커밋 확인
+git checkout <commit-hash>
+
+# 컨테이너 재빌드
+docker compose down
+docker compose build --no-cache
+docker compose up -d
 ```
 
-### Apache 에러 로그 확인
+---
+
+## 10. SSL 설정
+
+외부 리버스 프록시(Apache/Nginx)에서 SSL 처리를 담당합니다.
+
+### Let's Encrypt 인증서 발급 (서버에서)
+
 ```bash
-tail -f /var/log/apache2/gugarden_error.log
+# Certbot 설치
+apt install -y certbot
+
+# 인증서 발급
+certbot certonly --standalone -d your-domain.com
+
+# 인증서 자동 갱신 확인
+certbot renew --dry-run
 ```
 
-### 서버 재시작
-```bash
-pm2 restart gugarden
-systemctl reload apache2
-```
+### 외부 Apache 프록시 설정 예시
 
-### DB 연결 테스트
-```bash
-mysql -h [DB_HOST] -u[DB_USER] -p -e "SELECT 1"
+```apache
+<VirtualHost *:443>
+    ServerName your-domain.com
+
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/your-domain.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/your-domain.com/privkey.pem
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:3000/
+    ProxyPassReverse / http://127.0.0.1:3000/
+</VirtualHost>
 ```
