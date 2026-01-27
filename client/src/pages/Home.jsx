@@ -78,7 +78,7 @@ function Home() {
             style={{
               border: "1px solid #fff",
               padding: "12px 40px",
-              fontSize: "11px",
+              fontSize: "12px",
               letterSpacing: "0.2em",
               color: "#fff",
             }}
@@ -105,7 +105,7 @@ function Home() {
             <br />
             자연의 아름다움을 일상으로
           </h2>
-          <p style={{ color: "#888", fontSize: "14px" }}>
+          <p style={{ color: "#999", fontSize: "15px", lineHeight: 1.8 }}>
             구의정원은 테라리움과 비바리움을 통해 도시 속에서도 자연과 함께하는
             삶을 제안합니다.
           </p>
@@ -117,7 +117,7 @@ function Home() {
         <div className="responsive-container">
           <p
             style={{
-              fontSize: "11px",
+              fontSize: "12px",
               letterSpacing: "0.3em",
               color: "#666",
               marginBottom: "12px",
@@ -148,7 +148,7 @@ function Home() {
               <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>
                 Terrarium
               </h3>
-              <p style={{ fontSize: "12px", color: "#888" }}>
+              <p style={{ fontSize: "13px", color: "#888" }}>
                 밀폐된 유리 안의 작은 생태계
               </p>
             </Link>
@@ -165,7 +165,7 @@ function Home() {
               <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>
                 Vivarium
               </h3>
-              <p style={{ fontSize: "12px", color: "#888" }}>
+              <p style={{ fontSize: "13px", color: "#888" }}>
                 살아있는 자연을 담은 공간
               </p>
             </Link>
@@ -180,7 +180,7 @@ function Home() {
                 }}
               />
               <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>Kit</h3>
-              <p style={{ fontSize: "12px", color: "#888" }}>
+              <p style={{ fontSize: "13px", color: "#888" }}>
                 직접 만드는 나만의 정원
               </p>
             </Link>
@@ -188,107 +188,80 @@ function Home() {
         </div>
       </section>
 
-      {/* 피처드 상품 */}
-      <section className="responsive-section" style={{ background: "#0a0a0a" }}>
-        <div className="responsive-container">
-          <p
-            style={{
-              fontSize: "11px",
-              letterSpacing: "0.3em",
-              color: "#666",
-              marginBottom: "12px",
-            }}
-          >
-            Featured
-          </p>
-          <h2
-            className="section-title"
-            style={{ fontWeight: 200, marginBottom: "48px" }}
-          >
-            Selected Products
-          </h2>
-
-          <div
-            className="grid-4"
-          >
-            {featuredProducts.length > 0
-              ? featuredProducts.slice(0, 4).map((product) => (
-                  <Link
-                    key={product.id}
-                    to={`/product/${product.id}`}
-                    style={{ display: "block" }}
-                  >
-                    <div
-                      style={{
-                        aspectRatio: "1/1",
-                        background: "#1a1a1a",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      {product.thumbnail && (
-                        <img
-                          src={product.thumbnail}
-                          alt={product.name}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
-                    </div>
-                    <h4 style={{ fontSize: "14px", marginBottom: "4px" }}>
-                      {product.name}
-                    </h4>
-                    <p style={{ fontSize: "12px", color: "#888" }}>
-                      ₩ {formatPrice(product.sale_price || product.price)}
-                    </p>
-                  </Link>
-                ))
-              : [1, 2, 3, 4].map((i) => (
-                  <div key={i}>
-                    <div
-                      style={{
-                        aspectRatio: "1/1",
-                        background: "#1a1a1a",
-                        marginBottom: "12px",
-                      }}
-                    />
-                    <div
-                      style={{
-                        height: "16px",
-                        background: "#1a1a1a",
-                        width: "75%",
-                        marginBottom: "8px",
-                      }}
-                    />
-                    <div
-                      style={{
-                        height: "12px",
-                        background: "#1a1a1a",
-                        width: "50%",
-                      }}
-                    />
-                  </div>
-                ))}
-          </div>
-
-          <div style={{ textAlign: "center", marginTop: "64px" }}>
-            <Link
-              to="/terrarium"
+      {/* 피처드 상품 - 상품이 있을 때만 표시 */}
+      {featuredProducts.length > 0 && (
+        <section className="responsive-section" style={{ background: "#0a0a0a" }}>
+          <div className="responsive-container">
+            <p
               style={{
-                border: "1px solid #444",
-                padding: "12px 40px",
-                fontSize: "11px",
-                letterSpacing: "0.2em",
-                color: "#888",
+                fontSize: "12px",
+                letterSpacing: "0.3em",
+                color: "#666",
+                marginBottom: "12px",
               }}
             >
-              VIEW ALL PRODUCTS
-            </Link>
+              Featured
+            </p>
+            <h2
+              className="section-title"
+              style={{ fontWeight: 200, marginBottom: "48px" }}
+            >
+              Selected Products
+            </h2>
+
+            <div className="grid-4">
+              {featuredProducts.slice(0, 4).map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/product/${product.id}`}
+                  style={{ display: "block" }}
+                >
+                  <div
+                    style={{
+                      aspectRatio: "1/1",
+                      background: "#1a1a1a",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    {product.thumbnail && (
+                      <img
+                        src={product.thumbnail}
+                        alt={product.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
+                  </div>
+                  <h4 style={{ fontSize: "14px", marginBottom: "4px" }}>
+                    {product.name}
+                  </h4>
+                  <p style={{ fontSize: "13px", color: "#888" }}>
+                    ₩ {formatPrice(product.sale_price || product.price)}
+                  </p>
+                </Link>
+              ))}
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: "64px" }}>
+              <Link
+                to="/terrarium"
+                style={{
+                  border: "1px solid #444",
+                  padding: "12px 40px",
+                  fontSize: "12px",
+                  letterSpacing: "0.2em",
+                  color: "#888",
+                }}
+              >
+                VIEW ALL PRODUCTS
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 렌탈 */}
       <section className="responsive-section" style={{ background: "#000" }}>
@@ -309,7 +282,7 @@ function Home() {
           <div>
             <p
               style={{
-                fontSize: "11px",
+                fontSize: "12px",
                 letterSpacing: "0.3em",
                 color: "#666",
                 marginBottom: "12px",
@@ -328,8 +301,8 @@ function Home() {
             </h2>
             <p
               style={{
-                fontSize: "14px",
-                color: "#888",
+                fontSize: "15px",
+                color: "#999",
                 lineHeight: 1.8,
                 marginBottom: "32px",
               }}
@@ -342,7 +315,7 @@ function Home() {
               style={{
                 border: "1px solid #444",
                 padding: "12px 32px",
-                fontSize: "11px",
+                fontSize: "12px",
                 letterSpacing: "0.2em",
                 color: "#888",
               }}
@@ -365,26 +338,26 @@ function Home() {
           className="responsive-container grid-3"
         >
           <div>
-            <h3 style={{ fontSize: "14px", marginBottom: "12px" }}>
+            <h3 style={{ fontSize: "15px", marginBottom: "12px" }}>
               Handcrafted
             </h3>
-            <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "14px", color: "#999", lineHeight: 1.7 }}>
               모든 작품은 장인의 손으로 하나하나 정성껏 제작됩니다.
             </p>
           </div>
           <div>
-            <h3 style={{ fontSize: "14px", marginBottom: "12px" }}>
+            <h3 style={{ fontSize: "15px", marginBottom: "12px" }}>
               Safe Delivery
             </h3>
-            <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "14px", color: "#999", lineHeight: 1.7 }}>
               안전한 포장과 신속한 배송으로 완벽하게 전달합니다.
             </p>
           </div>
           <div>
-            <h3 style={{ fontSize: "14px", marginBottom: "12px" }}>
+            <h3 style={{ fontSize: "15px", marginBottom: "12px" }}>
               Care Guide
             </h3>
-            <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "14px", color: "#999", lineHeight: 1.7 }}>
               상세한 관리 가이드와 지속적인 케어 상담을 제공합니다.
             </p>
           </div>

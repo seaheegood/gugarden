@@ -34,6 +34,21 @@ function Header() {
 
   return (
     <>
+      {/* 헤더 상단 그라데이션 (배경 이미지 위에서 가독성 향상) */}
+      {hasHero && !isScrolled && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '120px',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)',
+            zIndex: 49,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <header
         style={{
           position: 'fixed',
@@ -72,7 +87,8 @@ function Header() {
                   style={{
                     fontSize: '13px',
                     letterSpacing: '0.15em',
-                    color: location.pathname === link.to ? '#fff' : '#888',
+                    color: location.pathname === link.to ? '#fff' : (hasHero && !isScrolled) ? '#ddd' : '#888',
+                    textShadow: (hasHero && !isScrolled) ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
                     transition: 'color 0.2s',
                   }}
                 >
@@ -85,21 +101,36 @@ function Header() {
             <div className="desktop-utils hide-mobile" style={{ flex: '1 1 0', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '32px' }}>
               <Link
                 to="/cart"
-                style={{ fontSize: '13px', letterSpacing: '0.1em', color: '#888' }}
+                style={{
+                  fontSize: '13px',
+                  letterSpacing: '0.1em',
+                  color: (hasHero && !isScrolled) ? '#ddd' : '#888',
+                  textShadow: (hasHero && !isScrolled) ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
+                }}
               >
                 CART
               </Link>
               {isAuthenticated ? (
                 <Link
                   to="/mypage"
-                  style={{ fontSize: '13px', letterSpacing: '0.1em', color: '#888' }}
+                  style={{
+                    fontSize: '13px',
+                    letterSpacing: '0.1em',
+                    color: (hasHero && !isScrolled) ? '#ddd' : '#888',
+                    textShadow: (hasHero && !isScrolled) ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
+                  }}
                 >
                   {user?.name || "MY"}
                 </Link>
               ) : (
                 <Link
                   to="/login"
-                  style={{ fontSize: '13px', letterSpacing: '0.1em', color: '#888' }}
+                  style={{
+                    fontSize: '13px',
+                    letterSpacing: '0.1em',
+                    color: (hasHero && !isScrolled) ? '#ddd' : '#888',
+                    textShadow: (hasHero && !isScrolled) ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
+                  }}
                 >
                   LOGIN
                 </Link>

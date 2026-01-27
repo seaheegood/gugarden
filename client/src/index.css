@@ -7,14 +7,15 @@
     --color-secondary: #1a1a1a;
     --color-accent: #2d5016;
     --color-text: #ffffff;
-    --color-text-muted: #a3a3a3;
+    --color-text-muted: #b8b8b8;
   }
 
   body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     background-color: var(--color-primary);
     color: var(--color-text);
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -108,7 +109,7 @@
   }
 
   .hero-subtitle {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   /* 섹션 타이틀 */
@@ -118,6 +119,15 @@
 
   .section-title-large {
     font-size: 28px;
+  }
+
+  /* 최소 폰트 크기 보장 */
+  .text-sm {
+    font-size: 13px;
+  }
+
+  .text-xs {
+    font-size: 12px;
   }
 
   /* 모바일 대응 (768px 이하) */
@@ -150,7 +160,7 @@
     }
 
     .hero-subtitle {
-      font-size: 10px;
+      font-size: 12px;
     }
 
     .section-title {
