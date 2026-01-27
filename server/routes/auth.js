@@ -172,6 +172,45 @@ router.put('/password', auth, async (req, res) => {
   }
 })
 
+// 회원 탈퇴 (개인정보 익명화)
+router.delete('/me', auth, async (req, res) => {
+  const connection = await pool.getConnection()
+  try {
+    await connection.beginTransaction()
+
+    const userId = req.user.id
+    const withdrawnEmail = `withdrawn_${userId}_${Date.now()}@deleted.local`
+
+    // 장바구니 삭제
+    await connection.query('DELETE FROM cart_items WHERE user_id = ?', [userId])
+
+    // 개인정보 익명화 (주문 기록은 user_id 유지하여 보관)
+    await connection.query(`
+      UPDATE users SET
+        email = ?,
+        password = NULL,
+        name = '탈퇴회원',
+        phone = NULL,
+        address = NULL,
+        address_detail = NULL,
+        zipcode = NULL,
+        provider = 'local',
+        provider_id = NULL,
+        profile_image = NULL
+      WHERE id = ?
+    `, [withdrawnEmail, userId])
+
+    await connection.commit()
+    res.json({ message: '회원 탈퇴가 완료되었습니다.' })
+  } catch (error) {
+    await connection.rollback()
+    console.error('회원 탈퇴 에러:', error)
+    res.status(500).json({ error: '회원 탈퇴에 실패했습니다.' })
+  } finally {
+    connection.release()
+  }
+})
+
 // JWT 토큰 생성 헬퍼 함수
 function generateToken(user) {
   return jwt.sign(

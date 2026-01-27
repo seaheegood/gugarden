@@ -109,6 +109,29 @@ function MyPage() {
     navigate('/')
   }
 
+  const handleWithdraw = async () => {
+    const confirmed = window.confirm(
+      '정말 탈퇴하시겠습니까?\n\n' +
+      '• 탈퇴 시 개인정보는 즉시 삭제됩니다.\n' +
+      '• 주문 내역은 법적 의무에 따라 일정 기간 보관됩니다.\n' +
+      '• 이 작업은 되돌릴 수 없습니다.'
+    )
+
+    if (!confirmed) return
+
+    const finalConfirm = window.confirm('마지막 확인입니다. 정말 탈퇴하시겠습니까?')
+    if (!finalConfirm) return
+
+    try {
+      await api.delete('/auth/me')
+      alert('회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.')
+      logout()
+      navigate('/')
+    } catch (error) {
+      alert(error.response?.data?.error || '회원 탈퇴에 실패했습니다.')
+    }
+  }
+
   const formatPrice = (price) => new Intl.NumberFormat('ko-KR').format(price)
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ko-KR')
 
@@ -263,10 +286,13 @@ function MyPage() {
           </form>
         )}
 
-        {/* 로그아웃 버튼 */}
-        <div style={{ marginTop: '48px', paddingTop: '32px', borderTop: '1px solid #333', textAlign: 'center' }}>
+        {/* 로그아웃 / 회원탈퇴 */}
+        <div style={{ marginTop: '48px', paddingTop: '32px', borderTop: '1px solid #333', textAlign: 'center', display: 'flex', justifyContent: 'center', gap: '32px' }}>
           <button onClick={handleLogout} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '14px', cursor: 'pointer' }}>
             로그아웃
+          </button>
+          <button onClick={handleWithdraw} style={{ background: 'transparent', border: 'none', color: '#666', fontSize: '14px', cursor: 'pointer' }}>
+            회원탈퇴
           </button>
         </div>
       </div>

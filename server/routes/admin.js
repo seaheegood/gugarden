@@ -297,7 +297,9 @@ router.post('/products', upload.single('thumbnail'), async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       categoryId, name, slug, description || null, price, salePrice || null,
-      stock || 0, thumbnailPath, isActive !== false, isFeatured || false
+      stock || 0, thumbnailPath,
+      isActive === true || isActive === 'true' ? 1 : 0,
+      isFeatured === true || isFeatured === 'true' ? 1 : 0
     ])
 
     res.status(201).json({
@@ -362,7 +364,10 @@ router.put('/products/:id', upload.single('thumbnail'), async (req, res) => {
       WHERE id = ?
     `, [
       categoryId, name, description, price, salePrice,
-      stock, thumbnailPath, isActive, isFeatured, id
+      stock, thumbnailPath,
+      isActive !== undefined ? (isActive === true || isActive === 'true' ? 1 : 0) : null,
+      isFeatured !== undefined ? (isFeatured === true || isFeatured === 'true' ? 1 : 0) : null,
+      id
     ])
 
     console.log('상품 수정 완료:', { id, thumbnail: thumbnailPath })
