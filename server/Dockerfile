@@ -13,8 +13,11 @@ COPY . .
 # 업로드 디렉토리 생성
 RUN mkdir -p uploads
 
+# entrypoint 스크립트 권한
+RUN chmod +x docker-entrypoint.sh
+
 # 포트 노출
 EXPOSE 5000
 
 # 실행
-CMD ["node", "server.js"]
+CMD ["./docker-entrypoint.sh"]
